@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Master</title>
+    <title>AI Prompt Master Pro</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,17 +21,19 @@
         /* Config Card */
         .config-card { background: white; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e5e7eb; }
         .config-card label { display: block; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-        textarea { width: 100%; height: 90px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; border: 1px solid #cbd5e1; }
+        textarea { width: 100%; height: 95px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; transition: 0.2s; }
+        textarea:focus { background: #fff; border-color: var(--primary); outline: none; }
 
         /* Select Group */
         .select-group { margin-bottom: 16px; }
         .select-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 600; }
-        select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; background: white; color: #1e293b; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; background: white; color: #1e293b; }
 
         /* Footer Preview */
         .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 16px; box-shadow: 0 -10px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; }
-        .output-text { color: #cbd5e1; font-size: 12px; line-height: 1.5; max-height: 70px; overflow-y: auto; margin-bottom: 12px; padding: 0 5px; }
-        .btn-copy { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; active { transform: scale(0.98); } }
+        .output-text { color: #cbd5e1; font-size: 12px; line-height: 1.5; max-height: 65px; overflow-y: auto; margin-bottom: 12px; padding: 0 5px; white-space: pre-wrap; }
+        .btn-copy { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; }
+        .save-hint { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -43,72 +45,39 @@
 
 <div class="container">
     <div id="section-gen" class="section active">
-        <div class="select-group">
-            <label>1. 人物特徵</label>
-            <select id="sel-features"></select>
-        </div>
-        <div class="select-group">
-            <label>2. 衣服款式</label>
-            <select id="sel-dress"></select>
-        </div>
-        <div class="select-group">
-            <label>3. 鞋子款式</label>
-            <select id="sel-shoes"></select>
-        </div>
-        <div class="select-group">
-            <label>4. 動作姿勢</label>
-            <select id="sel-action"></select>
-        </div>
-        <div class="select-group">
-            <label>5. 拍攝距離</label>
-            <select id="sel-dist"></select>
-        </div>
-        <div class="select-group">
-            <label>6. 場景背景</label>
-            <select id="sel-scene"></select>
-        </div>
-        <div class="select-group">
-            <label>生成數量</label>
-            <select id="sel-count"></select>
-        </div>
+        <div class="select-group"><label>1. 人物特徵</label><select id="sel-features"></select></div>
+        <div class="select-group"><label>2. 衣服款式</label><select id="sel-dress"></select></div>
+        <div class="select-group"><label>3. 鞋子款式</label><select id="sel-shoes"></select></div>
+        <div class="select-group"><label>4. 動作姿勢</label><select id="sel-action"></select></div>
+        <div class="select-group"><label>5. 拍攝距離</label><select id="sel-dist"></select></div>
+        <div class="select-group"><label>6. 場景背景</label><select id="sel-scene"></select></div>
+        <div class="select-group"><label>生成數量</label><select id="sel-count"></select></div>
     </div>
 
     <div id="section-cfg" class="section">
         <div class="config-card">
             <label>1. 人物特徵</label>
-            <textarea id="cfg-features">高挑苗條，豐滿曲線、細腰、修長腿部、緊緻身材
-嬌小可愛，清純面孔、纖細身材</textarea>
+            <textarea id="cfg-features" placeholder="每行一個選項..."></textarea>
         </div>
         <div class="config-card">
             <label>2. 衣服款式</label>
-            <textarea id="cfg-dress">絲綢吊帶長裙
-黑色包臀短裙
-法式碎花洋裙</textarea>
+            <textarea id="cfg-dress" placeholder="每行一個選項..."></textarea>
         </div>
         <div class="config-card">
             <label>3. 鞋子款式</label>
-            <textarea id="cfg-shoes">細跟高跟鞋
-一字帶涼鞋
-白色波鞋</textarea>
+            <textarea id="cfg-shoes" placeholder="每行一個選項..."></textarea>
         </div>
         <div class="config-card">
             <label>4. 動作姿勢</label>
-            <textarea id="cfg-action">慵懶的靠在椅子上，椅子旁邊有扶手架著二郎腿，一隻手借助扶手撐著臉
-優雅地站立，單手叉腰，眼神看向鏡頭
-自然行走中，側頭微笑，裙擺隨風飄動
-坐在窗台邊，雙手抱膝，望向窗外</textarea>
+            <textarea id="cfg-action" placeholder="每行一個選項..."></textarea>
         </div>
         <div class="config-card">
             <label>5. 拍攝距離</label>
-            <textarea id="cfg-dist">中景
-近景
-全身</textarea>
+            <textarea id="cfg-dist" placeholder="每行一個選項..."></textarea>
         </div>
         <div class="config-card">
             <label>6. 場景背景</label>
-            <textarea id="cfg-scene">豪華酒店頂層
-黃昏下的沙灘
-復古咖啡廳</textarea>
+            <textarea id="cfg-scene" placeholder="每行一個選項..."></textarea>
         </div>
         <div class="config-card">
             <label>生成數量</label>
@@ -116,6 +85,7 @@
 4
 9</textarea>
         </div>
+        <div class="save-hint">所有輸入將自動儲存於此裝置</div>
     </div>
 </div>
 
@@ -126,13 +96,13 @@
 
 <script>
     const items = [
-        { cfg: 'cfg-features', sel: 'sel-features' },
-        { cfg: 'cfg-dress', sel: 'sel-dress' },
-        { cfg: 'cfg-shoes', sel: 'sel-shoes' },
-        { cfg: 'cfg-action', sel: 'sel-action' }, // 新增動作
-        { cfg: 'cfg-dist', sel: 'sel-dist' },
-        { cfg: 'cfg-scene', sel: 'sel-scene' },
-        { cfg: 'cfg-count', sel: 'sel-count' }
+        { cfg: 'cfg-features', sel: 'sel-features', default: '高挑苗條，豐滿曲線、細腰、修長腿部、緊緻身材\n嬌小可愛，清純面孔、纖細身材' },
+        { cfg: 'cfg-dress', sel: 'sel-dress', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
+        { cfg: 'cfg-shoes', sel: 'sel-shoes', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋' },
+        { cfg: 'cfg-action', sel: 'sel-action', default: '慵懶的靠在椅子上，椅子旁邊有扶手架著二郎腿，一隻手借助扶手撐著臉\n優雅地站立，單手叉腰，眼神看向鏡頭\n坐在窗台邊，雙手抱膝，望向窗外' },
+        { cfg: 'cfg-dist', sel: 'sel-dist', default: '中景\n近景\n全身' },
+        { cfg: 'cfg-scene', sel: 'sel-scene', default: '豪華酒店頂層\n黃昏下的沙灘\n復古咖啡廳' },
+        { cfg: 'cfg-count', sel: 'sel-count', default: '1\n4\n9' }
     ];
 
     function switchTab(index) {
@@ -142,11 +112,22 @@
         window.scrollTo(0,0);
     }
 
+    // 初始化：讀取儲存嘅資料或使用預設值
     function init() {
         items.forEach(item => {
             const textarea = document.getElementById(item.cfg);
             const select = document.getElementById(item.sel);
-            textarea.addEventListener('input', () => updateDropdown(textarea, select));
+
+            // 從 localStorage 攞返之前儲低嘅文字
+            const savedData = localStorage.getItem(item.cfg);
+            textarea.value = savedData ? savedData : item.default;
+
+            textarea.addEventListener('input', () => {
+                updateDropdown(textarea, select);
+                // 每次打字都即刻儲存
+                localStorage.setItem(item.cfg, textarea.value);
+            });
+            
             select.addEventListener('change', updateResult);
             updateDropdown(textarea, select);
         });
@@ -171,7 +152,6 @@
             count: document.getElementById('sel-count').value
         };
 
-        // 結構化順序：主體 -> 衣著 -> 動作 -> 角度 -> 場景 -> 品質
         const template = `上傳的照片人物為原型，幫我生成${d.count}張照片。
 人物特徵：${d.feat}
 衣服：${d.dress}，${d.shoes}
@@ -187,8 +167,9 @@
         const text = document.getElementById('final-output').innerText;
         navigator.clipboard.writeText(text).then(() => {
             const btn = document.querySelector('.btn-copy');
+            const oldTxt = btn.innerText;
             btn.innerText = '✅ 已複製成功';
-            setTimeout(() => btn.innerText = '一鍵複製提示詞', 1500);
+            setTimeout(() => btn.innerText = oldTxt, 1500);
         });
     }
 
