@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Prompt Master</title>
+    <style>
+        :root { --primary: #4f46e5; --bg: #f3f4f6; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-bottom: 140px; }
+        
+        /* Tab Navigation */
+        .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .tab { flex: 1; text-align: center; padding: 16px; font-weight: bold; color: #94a3b8; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .container { padding: 15px; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Config Card */
+        .config-card { background: white; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e5e7eb; }
+        .config-card label { display: block; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        textarea { width: 100%; height: 90px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; border: 1px solid #cbd5e1; }
+
+        /* Select Group */
+        .select-group { margin-bottom: 16px; }
+        .select-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 600; }
+        select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; background: white; color: #1e293b; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* Footer Preview */
+        .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 16px; box-shadow: 0 -10px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; }
+        .output-text { color: #cbd5e1; font-size: 12px; line-height: 1.5; max-height: 70px; overflow-y: auto; margin-bottom: 12px; padding: 0 5px; }
+        .btn-copy { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; active { transform: scale(0.98); } }
+    </style>
+</head>
+<body>
+
+<div class="tabs">
+    <div class="tab active" onclick="switchTab(0)">生成模式</div>
+    <div class="tab" onclick="switchTab(1)">管理選項</div>
+</div>
+
+<div class="container">
+    <div id="section-gen" class="section active">
+        <div class="select-group">
+            <label>1. 人物特徵</label>
+            <select id="sel-features"></select>
+        </div>
+        <div class="select-group">
+            <label>2. 衣服款式</label>
+            <select id="sel-dress"></select>
+        </div>
+        <div class="select-group">
+            <label>3. 鞋子款式</label>
+            <select id="sel-shoes"></select>
+        </div>
+        <div class="select-group">
+            <label>4. 動作姿勢</label>
+            <select id="sel-action"></select>
+        </div>
+        <div class="select-group">
+            <label>5. 拍攝距離</label>
+            <select id="sel-dist"></select>
+        </div>
+        <div class="select-group">
+            <label>6. 場景背景</label>
+            <select id="sel-scene"></select>
+        </div>
+        <div class="select-group">
+            <label>生成數量</label>
+            <select id="sel-count"></select>
+        </div>
+    </div>
+
+    <div id="section-cfg" class="section">
+        <div class="config-card">
+            <label>1. 人物特徵</label>
+            <textarea id="cfg-features">高挑苗條，豐滿曲線、細腰、修長腿部、緊緻身材
+嬌小可愛，清純面孔、纖細身材</textarea>
+        </div>
+        <div class="config-card">
+            <label>2. 衣服款式</label>
+            <textarea id="cfg-dress">絲綢吊帶長裙
+黑色包臀短裙
+法式碎花洋裙</textarea>
+        </div>
+        <div class="config-card">
+            <label>3. 鞋子款式</label>
+            <textarea id="cfg-shoes">細跟高跟鞋
+一字帶涼鞋
+白色波鞋</textarea>
+        </div>
+        <div class="config-card">
+            <label>4. 動作姿勢</label>
+            <textarea id="cfg-action">慵懶的靠在椅子上，椅子旁邊有扶手架著二郎腿，一隻手借助扶手撐著臉
+優雅地站立，單手叉腰，眼神看向鏡頭
+自然行走中，側頭微笑，裙擺隨風飄動
+坐在窗台邊，雙手抱膝，望向窗外</textarea>
+        </div>
+        <div class="config-card">
+            <label>5. 拍攝距離</label>
+            <textarea id="cfg-dist">中景
+近景
+全身</textarea>
+        </div>
+        <div class="config-card">
+            <label>6. 場景背景</label>
+            <textarea id="cfg-scene">豪華酒店頂層
+黃昏下的沙灘
+復古咖啡廳</textarea>
+        </div>
+        <div class="config-card">
+            <label>生成數量</label>
+            <textarea id="cfg-count">1
+4
+9</textarea>
+        </div>
+    </div>
+</div>
+
+<div class="footer-preview">
+    <div class="output-text" id="final-output"></div>
+    <button class="btn-copy" onclick="copyPrompt()">一鍵複製提示詞</button>
+</div>
+
+<script>
+    const items = [
+        { cfg: 'cfg-features', sel: 'sel-features' },
+        { cfg: 'cfg-dress', sel: 'sel-dress' },
+        { cfg: 'cfg-shoes', sel: 'sel-shoes' },
+        { cfg: 'cfg-action', sel: 'sel-action' }, // 新增動作
+        { cfg: 'cfg-dist', sel: 'sel-dist' },
+        { cfg: 'cfg-scene', sel: 'sel-scene' },
+        { cfg: 'cfg-count', sel: 'sel-count' }
+    ];
+
+    function switchTab(index) {
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === index));
+        document.getElementById('section-gen').classList.toggle('active', index === 0);
+        document.getElementById('section-cfg').classList.toggle('active', index === 1);
+        window.scrollTo(0,0);
+    }
+
+    function init() {
+        items.forEach(item => {
+            const textarea = document.getElementById(item.cfg);
+            const select = document.getElementById(item.sel);
+            textarea.addEventListener('input', () => updateDropdown(textarea, select));
+            select.addEventListener('change', updateResult);
+            updateDropdown(textarea, select);
+        });
+    }
+
+    function updateDropdown(textarea, select) {
+        const lines = textarea.value.split('\n').filter(l => l.trim() !== '');
+        const currentVal = select.value;
+        select.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join('');
+        if (lines.includes(currentVal)) select.value = currentVal;
+        updateResult();
+    }
+
+    function updateResult() {
+        const d = {
+            feat: document.getElementById('sel-features').value,
+            dress: document.getElementById('sel-dress').value,
+            shoes: document.getElementById('sel-shoes').value,
+            action: document.getElementById('sel-action').value,
+            dist: document.getElementById('sel-dist').value,
+            scene: document.getElementById('sel-scene').value,
+            count: document.getElementById('sel-count').value
+        };
+
+        // 結構化順序：主體 -> 衣著 -> 動作 -> 角度 -> 場景 -> 品質
+        const template = `上傳的照片人物為原型，幫我生成${d.count}張照片。
+人物特徵：${d.feat}
+衣服：${d.dress}，${d.shoes}
+動作：${d.action}
+角度：第一人稱視角，${d.dist}距離特寫
+場景：虛化的${d.scene}背景
+品質：超寫實8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16`;
+
+        document.getElementById('final-output').innerText = template;
+    }
+
+    function copyPrompt() {
+        const text = document.getElementById('final-output').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.querySelector('.btn-copy');
+            btn.innerText = '✅ 已複製成功';
+            setTimeout(() => btn.innerText = '一鍵複製提示詞', 1500);
+        });
+    }
+
+    init();
+</script>
+
+</body>
+</html>
