@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 3.6</title>
+    <title>AI Prompt Pro 3.7</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -139,13 +139,14 @@
 
 <script>
     const BASE_FEATURES = "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
-    const EXTRA_FEATURE_POOL = ["銀色耳環", "細框無鏡片眼鏡", "黑色細框圓眼鏡", "黑色頸圈", "全身沾有濃稠凡士林"];
     
     let selectedExtraFeatures = [];
     let selectedSceneName = ''; 
     let selectedShoeName = ''; 
 
+    // 3.7 新增 'features' 到核心數據流，開放後台編輯
     const items = [
+        { id: 'features', label: '7. 附加特徵池 (每行一個，前台多選 Badge)', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n全身沾有濃稠凡士林' },
         { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個通用雙人互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰\n兩人並排站立在場景中央，手牽手對鏡頭微笑\n一人坐在凳上，另一人雙手搭在她肩膀上親密合照\n兩人背靠背站立，晚風輕輕吹拂髮絲' },
         { id: 'dress', label: '2. 衣服款式', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
         { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋\n裸色魚口鞋' },
@@ -167,18 +168,9 @@
     let currentRandomAction = '';
 
     function init() {
-        const badgeArea = document.getElementById('features-badges-area');
-        badgeArea.innerHTML = '';
-        EXTRA_FEATURE_POOL.forEach(feat => {
-            const badge = document.createElement('div');
-            badge.className = 'custom-badge';
-            badge.innerText = feat;
-            badge.onclick = () => toggleFeatureBadge(badge, feat);
-            badgeArea.appendChild(badge);
-        });
-
         const configArea = document.getElementById('config-fields');
         configArea.innerHTML = ''; 
+        
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = 'config-card';
@@ -191,37 +183,65 @@
             textarea.addEventListener('input', () => {
                 if (item.id === 'scene') renderSceneBadges();
                 else if (item.id === 'shoes') renderShoesBadges();
+                else if (item.id === 'features') renderFeaturesBadges();
                 else if (item.id === 'twoperson') syncDoublePersonDisplay();
                 else updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
             });
             
-            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson') {
+            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
                 const select = document.getElementById(`sel-${item.id}`);
                 select.addEventListener('change', () => updateResult());
                 updateDropdown(textarea, select, item.id);
             }
         });
 
+        // 動態渲染前台三大 Badge 區
+        renderFeaturesBadges();
         renderSceneBadges();
         renderShoesBadges();
         syncDoublePersonDisplay();
+    }
+
+    // 3.7 核心修改：從後台數據動態生成附加特徵多選 Badge
+    function renderFeaturesBadges() {
+        const text = document.getElementById('cfg-features').value;
+        const pool = text.split('\n').filter(l => l.trim() !== '');
+        const badgeArea = document.getElementById('features-badges-area');
+        badgeArea.innerHTML = '';
+
+        // 過濾掉已經在後台被刪除的選取特徵
+        selectedExtraFeatures = selectedExtraFeatures.filter(f => pool.includes(f));
+
+        pool.forEach(feat => {
+            const badge = document.createElement('div');
+            badge.className = 'custom-badge feature-badge';
+            badge.innerText = feat;
+
+            // 保持選取狀態
+            if (selectedExtraFeatures.includes(feat)) {
+                badge.classList.add('active');
+            }
+
+            badge.onclick = () => {
+                badge.classList.toggle('active');
+                if (badge.classList.contains('active')) {
+                    selectedExtraFeatures.push(feat);
+                } else {
+                    selectedExtraFeatures = selectedExtraFeatures.filter(f => f !== feat);
+                }
+                updateResult();
+            };
+            badgeArea.appendChild(badge);
+        });
+
+        updateResult();
     }
 
     function syncDoublePersonDisplay() {
         const text = document.getElementById('cfg-twoperson').value;
         document.getElementById('sel-twoperson-display').value = text;
         if(isDoubleMode) rollActionForCurrentScene();
-    }
-
-    function toggleFeatureBadge(element, featureName) {
-        element.classList.toggle('active');
-        if (element.classList.contains('active')) {
-            selectedExtraFeatures.push(featureName);
-        } else {
-            selectedExtraFeatures = selectedExtraFeatures.filter(f => f !== featureName);
-        }
-        updateResult();
     }
 
     function renderShoesBadges() {
@@ -294,7 +314,6 @@
         rollActionForCurrentScene();
     }
 
-    // 3.6 徹底移除 @雙人 區隔，場景底下全視為單人動作
     function parseScenes() {
         const text = document.getElementById('cfg-scene').value;
         const lines = text.split('\n');
@@ -328,18 +347,15 @@
         updateResult();
     }
 
-    // 3.6 核心架構升級：單人抽場景專屬動作，雙人直接抽通用獨立動作池
     function rollActionForCurrentScene() {
         let pool = [];
         const badgeTitle = document.getElementById('badge-title');
 
         if (isDoubleMode) {
-            // 雙人模式：直接讀取第 6 項「雙人通用動作池」
             const text = document.getElementById('cfg-twoperson').value;
             pool = text.split('\n').filter(l => l.trim() !== '');
             badgeTitle.innerText = "👥 已從通用池隨機抽取出雙人動作：";
         } else {
-            // 單人模式：綁定場景專屬動作池
             const parsedData = parseScenes();
             const match = parsedData.find(p => p.name === selectedSceneName);
             if (match && match.singleActions) {
@@ -367,14 +383,13 @@
     function updateResult() {
         const d = {};
         items.forEach(item => {
-            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson') {
+            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
                 d[item.id] = document.getElementById(`sel-${item.id}`).value;
             }
         });
 
         const modeText = isDoubleMode ? "（雙人互動模式）" : "";
         
-        // 3.6 提示詞輸出優化：如果是雙人模式，動作本身已經包含了雙人互動描述，因此不需要重複加雙人附加行
         let finalFeatures = BASE_FEATURES;
         if (selectedExtraFeatures.length > 0) {
             finalFeatures += "，" + selectedExtraFeatures.join('、');
@@ -418,6 +433,7 @@
         }
     }
 
+    // 3.7 備份全面支援新加入的特徵數據
     function exportConfig() {
         const data = {};
         items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
@@ -438,11 +454,12 @@
                 if (data[item.id]) {
                     document.getElementById(`cfg-${item.id}`).value = data[item.id];
                     localStorage.setItem(`cfg-${item.id}`, data[item.id]);
-                    if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson') {
+                    if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
                         updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
                     }
                 }
             });
+            renderFeaturesBadges();
             renderSceneBadges();
             renderShoesBadges();
             syncDoublePersonDisplay();
