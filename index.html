@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 2.7</title>
+    <title>AI Prompt Pro 3.2</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -18,34 +18,46 @@
         .section { display: none; }
         .section.active { display: block; }
 
-        /* Mode Button Grid */
-        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        /* Boolean Switch 區域 */
+        .switch-container { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .switch-label { font-size: 15px; font-weight: bold; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+        
+        /* Switch 核心樣式 */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--warning); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
-        /* 按鈕樣式 */
-        .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
-        .btn-random { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); }
+        /* Dim State 特徵與場景按鈕通用排版 */
+        .badge-grid-label { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; display: block; }
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+        .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #cbd5e1; background: #e2e8f0; color: #64748b; transition: all 0.2s ease; user-select: none; }
+        /* Active 狀態亮起 */
+        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); font-weight: bold; }
         
-        .btn-mode-single { background: #10b981; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
-        .btn-mode-double { background: var(--warning); color: white; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2); }
-        
+        /* 場景專用樣式（亮橘色，區分特徵） */
+        .custom-badge.scene-badge.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25); }
+
+        .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; transition: 0.2s; }
         .btn-secondary { background: #64748b; color: white; font-size: 13px; margin-top: 10px; }
         .btn-danger { background: var(--danger); color: white; font-size: 13px; margin-top: 10px; }
 
         /* Config Card */
         .config-card { background: white; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e5e7eb; }
         .config-card label { display: block; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-        textarea { width: 100%; height: 110px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; }
+        textarea { width: 100%; height: 140px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; line-height: 1.4; }
 
         /* Select Group */
         .select-group { margin-bottom: 16px; transition: 0.3s; }
         .select-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 600; }
         select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; background: white; color: #1e293b; }
 
-        /* 2.7 綁定動作小 Badge 樣式 */
-        .action-badge-container { display: flex; align-items: center; justify-content: space-between; background: #e0e7ff; padding: 10px 12px; border-radius: 10px; margin-top: 8px; font-size: 13px; color: #4338ca; border: 1px solid #c7d2fe; }
-        .action-badge-text { font-weight: bold; flex: 1; margin-left: 4px; margin-right: 8px; line-height: 1.3; }
-        .btn-reroll-action { background: white; border: 1px solid #b4c6fc; padding: 5px 10px; border-radius: 6px; color: #4f46e5; font-weight: bold; font-size: 12px; cursor: pointer; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .btn-reroll-action:active { background: #f3f4f6; }
+        /* 綁定動作小 Badge */
+        .action-badge-container { display: flex; flex-direction: column; align-items: flex-start; background: #e0e7ff; padding: 12px; border-radius: 10px; margin-top: 8px; font-size: 13px; color: #4338ca; border: 1px solid #c7d2fe; gap: 8px; }
+        .action-badge-text { font-weight: bold; line-height: 1.4; color: #1e1b4b; background: rgba(255,255,255,0.6); padding: 6px 10px; border-radius: 6px; width: 100%; }
+        .btn-reroll-action { background: white; border: 1px solid #b4c6fc; padding: 6px 12px; border-radius: 6px; color: #4f46e5; font-weight: bold; font-size: 12px; cursor: pointer; align-self: flex-end; }
 
         /* Footer Preview */
         .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 16px; box-shadow: 0 -10px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; }
@@ -63,13 +75,25 @@
 <div class="container">
     <!-- 生成模式 -->
     <div id="section-gen" class="section active">
-        <div class="mode-grid">
-            <button class="btn-action btn-random" onclick="randomize()">🎲 隨機組合</button>
-            <button id="btn-mode-toggle" class="btn-action btn-mode-single" onclick="toggleMode()">👤 模式：單人</button>
+        
+        <!-- Boolean Switcher -->
+        <div class="switch-container">
+            <span class="switch-label" id="switch-status-text">👤 當前模式：單人</span>
+            <label class="switch">
+                <input type="checkbox" id="mode-checkbox" onchange="toggleMode(this.checked)">
+                <span class="slider"></span>
+            </label>
         </div>
 
-        <div class="select-group"><label>1. 人物特徵</label><select id="sel-features"></select></div>
+        <!-- 自由加選特徵區 (Dim State 複選) -->
+        <span class="badge-grid-label">加選附加特徵 (可多選)：</span>
+        <div class="badge-grid" id="features-badges-area"></div>
         
+        <!-- 3.2 全新改裝：動態場景背景 Badge 點選區 (單選) -->
+        <span class="badge-grid-label">5. 選擇場景與背景 (單選)：</span>
+        <div class="badge-grid" id="scene-badges-area"></div>
+        
+        <!-- 雙人選項 (平時隱藏) -->
         <div class="select-group" id="group-twoperson" style="display: none;">
             <label style="color: var(--warning);">6. 雙人描述 / 第二人互動</label>
             <select id="sel-twoperson"></select>
@@ -79,15 +103,12 @@
         <div class="select-group"><label>3. 鞋子款式</label><select id="sel-shoes"></select></div>
         <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
         
-        <!-- 5. 場景選擇（已包含隨機動作觸發） -->
+        <!-- 5. 綁定動作池顯示框 -->
         <div class="select-group">
-            <label>5. 場景與背景氛圍</label>
-            <select id="sel-scene"></select>
-            <!-- 2.7 動態動作顯示區 -->
             <div class="action-badge-container">
-                <span>🎬 隨機動作：</span>
-                <span id="current-action-display" class="action-badge-text">正在讀取...</span>
-                <button class="btn-reroll-action" onclick="rollActionForCurrentScene()">🎲 換個動作</button>
+                <span id="badge-title">👤 已隨機挑選單人專屬動作：</span>
+                <div id="current-action-display" class="action-badge-text">正在讀取...</div>
+                <button class="btn-reroll-action" onclick="rollActionForCurrentScene()">🎲 重新抽動作</button>
             </div>
         </div>
         
@@ -113,22 +134,62 @@
 </div>
 
 <script>
-    // 2.7 核心數據：移除了獨立的動作欄，整合進場景欄位
+    const BASE_FEATURES = "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
+    const EXTRA_FEATURE_POOL = ["銀色耳環", "細框無鏡片眼鏡", "黑色細框圓眼鏡", "黑色頸圈", "全身沾有濃稠凡士林"];
+    
+    let selectedExtraFeatures = [];
+    let selectedSceneName = ''; // 儲存當前單選的場景名稱
+
     const items = [
-        { id: 'features', label: '1. 人物特徵', default: '高挑苗條，豐滿曲線、細腰、修長腿部、緊緻身材\n嬌小可愛，清純面孔、纖細身材' },
         { id: 'twoperson', label: '6. 雙人模式描述 (第二人與互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰' },
         { id: 'dress', label: '2. 衣服款式', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
         { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋' },
-        { id: 'dist', label: '4. 鏡頭角度與距離', default: '第一人稱視角，中景鏡頭拍攝\n電影感特寫鏡頭，專注於面部細節與柔和眼神\n低角度仰拍，全身遠景鏡頭，突出現體比例' },
-        // 智能場景綁定格式：場景名 | 動作 1 // 動作 2 // 動作 3 (可以寫幾十個)
-        { id: 'scene', label: '5. 場景與背景氛圍 (格式: 場景描述 | 動作1 // 動作2)', default: '背後是虛化的豪華酒店頂層夜景，都市霓虹閃爍 | 慵懶的靠在椅子上，一隻手撐著臉 // 優雅地站立，單手叉腰，眼神看向鏡頭 // 手裡拿著香檳杯，微微歪頭微笑\n清晰的黃昏沙灘背景，帶有金黃色的夕陽逆光 | 赤腳在沙灘上奔跑，裙擺隨風飄動 // 坐在沙灘上，雙手撐在背後看著落日 // 蹲在水中央，用手輕輕拍打海水\n復古咖啡廳室內環境，柔和的窗光灑落 | 坐在窗台邊，雙手抱膝，望向窗外 // 手托著腮，靜靜地看著面前的咖啡杯 // 正在翻閱一本精裝書，神情專注' },
-        { id: 'count', label: '生成數量', default: '1\n4\n9' }
+        { id: 'dist', label: '4. 鏡頭角度與距離', default: '第一人稱視角，中景鏡頭拍摄\n電影感特寫鏡頭，專注於面部細節與柔和眼神\n低角度仰拍，全身遠景鏡頭，突出現體比例' },
+        // 3.2 預設將白色攝影棚放第一個，並內置動作
+        { id: 'scene', label: '5. 場景與背景 (格式: #場景名，可選用 @雙人 區隔動作池)', default: `# 白色攝影棚背景，背景乾淨簡潔，專業人像棚拍燈光
+雙手叉腰優雅站立，自信地面對鏡頭
+微微側身，手輕輕撫摸著長髮
+雙腿交疊坐在高腳凳上，眼神帶點高冷
+正面站立，身體微微前傾，雙手自然垂下
+@雙人
+兩人並排站立在白色棚景中央，手牽手微笑
+一人坐在高腳凳上，另一人雙手搭在她肩膀上，親密合照
+背靠背站立，眼神同時銳利地直視鏡頭
+
+# 背後是虛化的豪華酒店頂層夜景，都市霓虹閃爍
+慵懶的靠在椅子上，一隻手撐著臉
+優雅地站立，單手叉腰，眼神看向鏡頭
+手裡拿著香檳杯，微微歪頭微笑
+雙手扶著欄杆，眺望遠方的夜景
+@雙人
+兩人背靠背站立在露台，晚風吹拂
+情侶手牽手靠在欄杆邊，一起眺望繁華夜景
+
+# 清晰的黃昏沙灘背景，帶有金黃色的夕陽逆光
+赤腳在沙灘上奔跑，裙擺隨風飄動
+坐在沙灘上，雙手撐在背後看著落日
+@雙人
+手牽手在沙灘上漫步奔跑，裙擺隨風飄動
+並肩坐在沙灘上，看著落日，男生摟著女生的肩膀` },
+        { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
     ];
 
     let isDoubleMode = false;
-    let currentRandomAction = ''; // 紀錄當前被抽中的動作
+    let currentRandomAction = '';
 
     function init() {
+        // 渲染特徵 Badge
+        const badgeArea = document.getElementById('features-badges-area');
+        badgeArea.innerHTML = '';
+        EXTRA_FEATURE_POOL.forEach(feat => {
+            const badge = document.createElement('div');
+            badge.className = 'custom-badge';
+            badge.innerText = feat;
+            badge.onclick = () => toggleFeatureBadge(badge, feat);
+            badgeArea.appendChild(badge);
+        });
+
+        // 初始化後台設定框與其餘下拉選單
         const configArea = document.getElementById('config-fields');
         configArea.innerHTML = ''; 
         items.forEach(item => {
@@ -138,120 +199,186 @@
             configArea.appendChild(card);
 
             const textarea = document.getElementById(`cfg-${item.id}`);
-            const select = document.getElementById(`sel-${item.id}`);
-
-            const saved = localStorage.getItem(`cfg-${item.id}`);
-            textarea.value = saved ? saved : item.default;
+            textarea.value = localStorage.getItem(`cfg-${item.id}`) || item.default;
 
             textarea.addEventListener('input', () => {
-                updateDropdown(textarea, select, item.id);
+                if (item.id === 'scene') renderSceneBadges();
+                else updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
             });
             
-            select.addEventListener('change', () => {
-                if (item.id === 'scene') {
-                    rollActionForCurrentScene(); // 切換場景時，自動重抽動作
-                } else {
-                    updateResult();
-                }
-            });
-            
-            updateDropdown(textarea, select, item.id);
+            if (item.id !== 'scene') {
+                const select = document.getElementById(`sel-${item.id}`);
+                select.addEventListener('change', () => updateResult());
+                updateDropdown(textarea, select, item.id);
+            }
         });
+
+        // 初始動態渲染場景大 Badge 區
+        renderSceneBadges();
+    }
+
+    // 處理特徵複選
+    function toggleFeatureBadge(element, featureName) {
+        element.classList.toggle('active');
+        if (element.classList.contains('active')) {
+            selectedExtraFeatures.push(featureName);
+        } else {
+            selectedExtraFeatures = selectedExtraFeatures.filter(f => f !== featureName);
+        }
+        updateResult();
+    }
+
+    // 3.2 核心更新：將解析出嚟嘅場景自動渲染成 Badge，並支援動態點選切換
+    function renderSceneBadges() {
+        const parsedScenes = parseScenes();
+        const sceneArea = document.getElementById('scene-badges-area');
+        sceneArea.innerHTML = '';
+
+        if (parsedScenes.length === 0) return;
+
+        // 如果當前記錄的已選場景在列表裡找不到了，或者剛進網頁，就預設選第一個
+        if (!selectedSceneName || !parsedScenes.some(p => p.name === selectedSceneName)) {
+            selectedSceneName = parsedScenes[0].name;
+        }
+
+        parsedScenes.forEach(scene => {
+            const badge = document.createElement('div');
+            badge.className = 'custom-badge scene-badge';
+            badge.innerText = scene.name;
+            
+            // 判斷是否為目前選中的背景
+            if (scene.name === selectedSceneName) {
+                badge.classList.add('active');
+            }
+
+            // 點擊事件：單選邏輯
+            badge.onclick = () => {
+                document.querySelectorAll('.scene-badge').forEach(b => b.classList.remove('active'));
+                badge.classList.add('active');
+                selectedSceneName = scene.name;
+                rollActionForCurrentScene(); // 切換背景自動重新抽 10 個動作
+            };
+
+            sceneArea.appendChild(badge);
+        });
+
+        rollActionForCurrentScene();
+    }
+
+    function parseScenes() {
+        const text = document.getElementById('cfg-scene').value;
+        const lines = text.split('\n');
+        const sceneList = [];
+        let currentScene = null;
+        let isDoubleSection = false;
+
+        lines.forEach(line => {
+            const t = line.trim();
+            if (!t) return;
+
+            if (t.startsWith('#')) {
+                currentScene = { name: t.substring(1).trim(), singleActions: [], doubleActions: [] };
+                sceneList.push(currentScene);
+                isDoubleSection = false;
+            } else if (t.startsWith('@雙人')) {
+                isDoubleSection = true;
+            } else {
+                if (currentScene) {
+                    if (isDoubleSection) currentScene.doubleActions.push(t);
+                    else currentScene.singleActions.push(t);
+                } else {
+                    currentScene = { name: '預設場景', singleActions: [t], doubleActions: [t] };
+                    sceneList.push(currentScene);
+                }
+            }
+        });
+        return sceneList;
     }
 
     function updateDropdown(textarea, select, id) {
-        const lines = textarea.value.split('\n').filter(l => l.trim() !== '');
         const current = select.value;
-        
-        if (id === 'scene') {
-            // 2.7 濾掉右邊嘅動作代碼，Dropdown 只顯示左邊嘅場景名
-            select.innerHTML = lines.map(l => {
-                const sceneName = l.split('|')[0].trim();
-                return `<option value="${sceneName}">${sceneName}</option>`;
-            }).join('');
-        } else {
-            select.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join('');
-        }
-        
-        if (lines.some(l => l.split('|')[0].trim() === current)) select.value = current;
-        
-        if (id === 'scene') {
-            rollActionForCurrentScene();
-        } else {
-            updateResult();
-        }
+        const lines = textarea.value.split('\n').filter(l => l.trim() !== '');
+        select.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join('');
+        if (lines.includes(current)) select.value = current;
+        updateResult();
     }
 
-    // 2.7 核心算法：抽取當前場景對應嘅隨機動作
     function rollActionForCurrentScene() {
-        const sceneSelect = document.getElementById('sel-scene');
-        const sceneTextarea = document.getElementById('cfg-scene');
-        const selectedSceneName = sceneSelect.value;
+        const parsedData = parseScenes();
+        const match = parsedData.find(p => p.name === selectedSceneName);
         
-        const lines = sceneTextarea.value.split('\n').filter(l => l.trim() !== '');
-        const matchingLine = lines.find(l => l.split('|')[0].trim() === selectedSceneName);
-        
-        if (matchingLine && matchingLine.includes('|')) {
-            const actionsPart = matchingLine.split('|')[1];
-            // 透過 // 切割成動作池陣列
-            const actions = actionsPart.split('//').map(a => a.trim()).filter(a => a !== '');
-            if (actions.length > 0) {
-                // 隨機抽一個
-                currentRandomAction = actions[Math.floor(Math.random() * actions.length)];
+        let pool = [];
+        const badgeTitle = document.getElementById('badge-title');
+
+        if (match) {
+            if (isDoubleMode) {
+                pool = match.doubleActions.length > 0 ? [...match.doubleActions] : [...match.singleActions];
+                badgeTitle.innerText = "👥 已隨機挑選雙人專屬動作：";
             } else {
-                currentRandomAction = '自然放鬆的姿勢';
+                pool = [...match.singleActions];
+                badgeTitle.innerText = "👤 已隨機挑選單人專屬動作：";
             }
+        }
+        
+        if (pool.length > 0) {
+            let selectedActions = [];
+            const targetCount = Math.min(10, pool.length);
+            for(let i = 0; i < targetCount; i++) {
+                const randomIndex = Math.floor(Math.random() * pool.length);
+                selectedActions.push(pool.splice(randomIndex, 1)[0]);
+            }
+            currentRandomAction = selectedActions.join('、');
         } else {
             currentRandomAction = '自然放鬆的姿勢';
         }
         
-        // 即時反映喺前台介面
         document.getElementById('current-action-display').innerText = currentRandomAction;
         updateResult();
     }
 
     function updateResult() {
         const d = {};
-        items.forEach(item => d[item.id] = document.getElementById(`sel-${item.id}`).value);
+        items.forEach(item => {
+            if (item.id !== 'scene') {
+                d[item.id] = document.getElementById(`sel-${item.id}`).value;
+            }
+        });
 
         const modeText = isDoubleMode ? "（雙人互動模式）" : "";
         const doubleLine = isDoubleMode ? `\n雙人配合：${d.twoperson}` : "";
 
+        let finalFeatures = BASE_FEATURES;
+        if (selectedExtraFeatures.length > 0) {
+            finalFeatures += "，" + selectedExtraFeatures.join('、');
+        }
+
         const template = `上傳的照片人物為原型${modeText}，幫我生成${d.count}張照片。
-人物特徵：${d.features}${doubleLine}
+人物特徵：${finalFeatures}${doubleLine}
 衣服：${d.dress}，${d.shoes}
 動作：${currentRandomAction}
 角度：${d.dist}
-場景：${d.scene}
+場景：${selectedSceneName}
 品質：超寫實 8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16`;
 
         document.getElementById('final-output').innerText = template;
     }
 
-    function randomize() {
-        items.forEach(item => {
-            const select = document.getElementById(`sel-${item.id}`);
-            const count = select.options.length;
-            if (count > 0) select.selectedIndex = Math.floor(Math.random() * count);
-        });
-        rollActionForCurrentScene(); // 總隨機時也會刷新動作
-    }
-
-    function toggleMode() {
-        isDoubleMode = !isDoubleMode;
-        const btn = document.getElementById('btn-mode-toggle');
+    function toggleMode(checked) {
+        isDoubleMode = checked;
+        const statusText = document.getElementById('switch-status-text');
         const doubleGroup = document.getElementById('group-twoperson');
+        
         if (isDoubleMode) {
-            btn.innerText = '👥 模式：雙人';
-            btn.className = 'btn-action btn-mode-double';
+            statusText.innerText = '👥 當前模式：雙人';
+            statusText.style.color = 'var(--warning)';
             doubleGroup.style.display = 'block';
         } else {
-            btn.innerText = '👤 模式：單人';
-            btn.className = 'btn-action btn-mode-single';
+            statusText.innerText = '👤 當前模式：單人';
+            statusText.style.color = '#1e293b';
             doubleGroup.style.display = 'none';
         }
-        updateResult();
+        rollActionForCurrentScene();
     }
 
     function resetConfig() {
@@ -262,6 +389,7 @@
         }
     }
 
+    // 匯出功能 (完美包含場景數據)
     function exportConfig() {
         const data = {};
         items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
@@ -282,9 +410,12 @@
                 if (data[item.id]) {
                     document.getElementById(`cfg-${item.id}`).value = data[item.id];
                     localStorage.setItem(`cfg-${item.id}`, data[item.id]);
-                    updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
+                    if (item.id !== 'scene') {
+                        updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
+                    }
                 }
             });
+            renderSceneBadges();
             alert('導入成功！');
         };
         reader.readAsText(file);
