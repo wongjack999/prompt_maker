@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 3.7</title>
+    <title>AI Prompt Pro 3.8</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -97,17 +97,11 @@
         <!-- 動態場景背景 Badge 點選區 (單選) -->
         <span class="badge-grid-label">5. 選擇場景與背景 (單選)：</span>
         <div class="badge-grid" id="scene-badges-area"></div>
-        
-        <!-- 雙人選項 (平時隱藏) -->
-        <div class="select-group" id="group-twoperson" style="display: none;">
-            <label style="color: var(--warning);">6. 雙人獨立動作與互動池 (自由換行增加，系統會自動隨機抽選)</label>
-            <textarea id="sel-twoperson-display" style="height: 100px; margin-top:5px;" readonly></textarea>
-        </div>
 
         <div class="select-group"><label>2. 衣服款式 (輸出時會自動附加「極致輕薄」)</label><select id="sel-dress"></select></div>
         <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
         
-        <!-- 5. 綁定動作池顯示框 -->
+        <!-- 5. 綁定動作池顯示框 (單/雙人模式結果都會在這邊完美呈現) -->
         <div class="select-group">
             <div class="action-badge-container">
                 <span id="badge-title">👤 已隨機挑選單人專屬動作：</span>
@@ -144,7 +138,6 @@
     let selectedSceneName = ''; 
     let selectedShoeName = ''; 
 
-    // 3.7 新增 'features' 到核心數據流，開放後台編輯
     const items = [
         { id: 'features', label: '7. 附加特徵池 (每行一個，前台多選 Badge)', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n全身沾有濃稠凡士林' },
         { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個通用雙人互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰\n兩人並排站立在場景中央，手牽手對鏡頭微笑\n一人坐在凳上，另一人雙手搭在她肩膀上親密合照\n兩人背靠背站立，晚風輕輕吹拂髮絲' },
@@ -184,8 +177,10 @@
                 if (item.id === 'scene') renderSceneBadges();
                 else if (item.id === 'shoes') renderShoesBadges();
                 else if (item.id === 'features') renderFeaturesBadges();
-                else if (item.id === 'twoperson') syncDoublePersonDisplay();
-                else updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
+                else if (item.id === 'twoperson' && isDoubleMode) rollActionForCurrentScene();
+                else if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
+                    updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
+                }
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
             });
             
@@ -196,21 +191,18 @@
             }
         });
 
-        // 動態渲染前台三大 Badge 區
         renderFeaturesBadges();
         renderSceneBadges();
         renderShoesBadges();
-        syncDoublePersonDisplay();
+        rollActionForCurrentScene();
     }
 
-    // 3.7 核心修改：從後台數據動態生成附加特徵多選 Badge
     function renderFeaturesBadges() {
         const text = document.getElementById('cfg-features').value;
         const pool = text.split('\n').filter(l => l.trim() !== '');
         const badgeArea = document.getElementById('features-badges-area');
         badgeArea.innerHTML = '';
 
-        // 過濾掉已經在後台被刪除的選取特徵
         selectedExtraFeatures = selectedExtraFeatures.filter(f => pool.includes(f));
 
         pool.forEach(feat => {
@@ -218,7 +210,6 @@
             badge.className = 'custom-badge feature-badge';
             badge.innerText = feat;
 
-            // 保持選取狀態
             if (selectedExtraFeatures.includes(feat)) {
                 badge.classList.add('active');
             }
@@ -236,12 +227,6 @@
         });
 
         updateResult();
-    }
-
-    function syncDoublePersonDisplay() {
-        const text = document.getElementById('cfg-twoperson').value;
-        document.getElementById('sel-twoperson-display').value = text;
-        if(isDoubleMode) rollActionForCurrentScene();
     }
 
     function renderShoesBadges() {
@@ -352,6 +337,7 @@
         const badgeTitle = document.getElementById('badge-title');
 
         if (isDoubleMode) {
+            // 雙人模式下：直接去讀後台資料，絕不在前台安插多餘 DOM 輸入框
             const text = document.getElementById('cfg-twoperson').value;
             pool = text.split('\n').filter(l => l.trim() !== '');
             badgeTitle.innerText = "👥 已從通用池隨機抽取出雙人動作：";
@@ -411,16 +397,13 @@
     function toggleMode(checked) {
         isDoubleMode = checked;
         const statusText = document.getElementById('switch-status-text');
-        const doubleGroup = document.getElementById('group-twoperson');
         
         if (isDoubleMode) {
             statusText.innerText = '👥 當前模式：雙人';
             statusText.style.color = 'var(--warning)';
-            doubleGroup.style.display = 'block';
         } else {
             statusText.innerText = '👤 當前模式：單人';
             statusText.style.color = '#1e293b';
-            doubleGroup.style.display = 'none';
         }
         rollActionForCurrentScene();
     }
@@ -433,7 +416,6 @@
         }
     }
 
-    // 3.7 備份全面支援新加入的特徵數據
     function exportConfig() {
         const data = {};
         items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
@@ -462,7 +444,7 @@
             renderFeaturesBadges();
             renderSceneBadges();
             renderShoesBadges();
-            syncDoublePersonDisplay();
+            rollActionForCurrentScene();
             alert('導入成功！');
         };
         reader.readAsText(file);
