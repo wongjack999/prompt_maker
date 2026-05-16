@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 3.3</title>
+    <title>AI Prompt Pro 3.4</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -90,11 +90,11 @@
         <span class="badge-grid-label">加選附加特徵 (可多選)：</span>
         <div class="badge-grid" id="features-badges-area"></div>
         
-        <!-- 3.3 全新改裝：鞋子款式變身 Badge 點選區 (單選，預設全 dim) -->
+        <!-- 鞋子款式變身 Badge 點選區 (單選，預設全 dim) -->
         <span class="badge-grid-label">3. 鞋子款式 (單選)：</span>
         <div class="badge-grid" id="shoes-badges-area"></div>
 
-        <!-- 5. 動態場景背景 Badge 點選區 (單選) -->
+        <!-- 動態場景背景 Badge 點選區 (單選) -->
         <span class="badge-grid-label">5. 選擇場景與背景 (單選)：</span>
         <div class="badge-grid" id="scene-badges-area"></div>
         
@@ -107,7 +107,7 @@
         <div class="select-group"><label>2. 衣服款式</label><select id="sel-dress"></select></div>
         <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
         
-        <!-- 5. 綁定動作池顯示框 -->
+        <!-- 綁定動作池顯示框 -->
         <div class="select-group">
             <div class="action-badge-container">
                 <span id="badge-title">👤 已隨機挑選單人專屬動作：</span>
@@ -143,7 +143,7 @@
     
     let selectedExtraFeatures = [];
     let selectedSceneName = ''; 
-    let selectedShoeName = ''; // 儲存當前點選的鞋子款式（預設為空，即全 dim）
+    let selectedShoeName = ''; 
 
     const items = [
         { id: 'twoperson', label: '6. 雙人模式描述 (第二人與互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰' },
@@ -210,12 +210,10 @@
             }
         });
 
-        // 初始動態渲染場景與鞋子 Badge 區
         renderSceneBadges();
         renderShoesBadges();
     }
 
-    // 處理特徵複選
     function toggleFeatureBadge(element, featureName) {
         element.classList.toggle('active');
         if (element.classList.contains('active')) {
@@ -226,14 +224,12 @@
         updateResult();
     }
 
-    // 3.3 核心更新：將後台鞋子數據動態渲染成單選 Badge，預設全部 dim 灰色
     function renderShoesBadges() {
         const text = document.getElementById('cfg-shoes').value;
         const lines = text.split('\n').filter(l => l.trim() !== '');
         const shoesArea = document.getElementById('shoes-badges-area');
         shoesArea.innerHTML = '';
 
-        // 如果之前選的鞋子在後台被刪除了，就清空選取狀態
         if (selectedShoeName && !lines.includes(selectedShoeName)) {
             selectedShoeName = '';
         }
@@ -243,14 +239,11 @@
             badge.className = 'custom-badge shoe-badge';
             badge.innerText = shoe;
 
-            // 如果匹配到當前選中的鞋子，亮起藍色
             if (shoe === selectedShoeName) {
                 badge.classList.add('active');
             }
 
-            // 單選點擊邏輯
             badge.onclick = () => {
-                // 如果點擊的是已經選中的鞋子，就取消選取（變回全 dim 狀態）
                 if (selectedShoeName === shoe) {
                     selectedShoeName = '';
                     badge.classList.remove('active');
@@ -268,7 +261,6 @@
         updateResult();
     }
 
-    // 動態場景渲染
     function renderSceneBadges() {
         const parsedScenes = parseScenes();
         const sceneArea = document.getElementById('scene-badges-area');
@@ -389,12 +381,12 @@
             finalFeatures += "，" + selectedExtraFeatures.join('、');
         }
 
-        // 3.3 處理鞋子部分的提示詞輸出。如果都沒選（全 dim），就輸出空字串，免得出現 undefined。
         const shoePrompt = selectedShoeName ? `，${selectedShoeName}` : "";
 
+        // 3.4 核心修改：在此處直接鎖死「極致輕薄嘅」在衣服名稱前面
         const template = `上傳的照片人物為原型${modeText}，幫我生成${d.count}張照片。
 人物特徵：${finalFeatures}${doubleLine}
-衣服：${d.dress}${shoePrompt}
+衣服：極致輕薄的${d.dress}${shoePrompt}
 動作：${currentRandomAction}
 角度：${d.dist}
 場景：${selectedSceneName}
