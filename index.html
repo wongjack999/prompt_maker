@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 3.2</title>
+    <title>AI Prompt Pro 3.3</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,14 +30,15 @@
         input:checked + .slider { background-color: var(--warning); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* Dim State 特徵與場景按鈕通用排版 */
+        /* Dim State 通用按鈕排版 */
         .badge-grid-label { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; display: block; }
         .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
         .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #cbd5e1; background: #e2e8f0; color: #64748b; transition: all 0.2s ease; user-select: none; }
-        /* Active 狀態亮起 */
+        
+        /* Active 狀態亮起 (特徵、鞋子) */
         .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); font-weight: bold; }
         
-        /* 場景專用樣式（亮橘色，區分特徵） */
+        /* 場景專用樣式（藍色亮起） */
         .custom-badge.scene-badge.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25); }
 
         .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; transition: 0.2s; }
@@ -89,7 +90,11 @@
         <span class="badge-grid-label">加選附加特徵 (可多選)：</span>
         <div class="badge-grid" id="features-badges-area"></div>
         
-        <!-- 3.2 全新改裝：動態場景背景 Badge 點選區 (單選) -->
+        <!-- 3.3 全新改裝：鞋子款式變身 Badge 點選區 (單選，預設全 dim) -->
+        <span class="badge-grid-label">3. 鞋子款式 (單選)：</span>
+        <div class="badge-grid" id="shoes-badges-area"></div>
+
+        <!-- 5. 動態場景背景 Badge 點選區 (單選) -->
         <span class="badge-grid-label">5. 選擇場景與背景 (單選)：</span>
         <div class="badge-grid" id="scene-badges-area"></div>
         
@@ -100,7 +105,6 @@
         </div>
 
         <div class="select-group"><label>2. 衣服款式</label><select id="sel-dress"></select></div>
-        <div class="select-group"><label>3. 鞋子款式</label><select id="sel-shoes"></select></div>
         <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
         
         <!-- 5. 綁定動作池顯示框 -->
@@ -138,14 +142,14 @@
     const EXTRA_FEATURE_POOL = ["銀色耳環", "細框無鏡片眼鏡", "黑色細框圓眼鏡", "黑色頸圈", "全身沾有濃稠凡士林"];
     
     let selectedExtraFeatures = [];
-    let selectedSceneName = ''; // 儲存當前單選的場景名稱
+    let selectedSceneName = ''; 
+    let selectedShoeName = ''; // 儲存當前點選的鞋子款式（預設為空，即全 dim）
 
     const items = [
         { id: 'twoperson', label: '6. 雙人模式描述 (第二人與互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰' },
         { id: 'dress', label: '2. 衣服款式', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
-        { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋' },
+        { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋\n裸色魚口鞋' },
         { id: 'dist', label: '4. 鏡頭角度與距離', default: '第一人稱視角，中景鏡頭拍摄\n電影感特寫鏡頭，專注於面部細節與柔和眼神\n低角度仰拍，全身遠景鏡頭，突出現體比例' },
-        // 3.2 預設將白色攝影棚放第一個，並內置動作
         { id: 'scene', label: '5. 場景與背景 (格式: #場景名，可選用 @雙人 區隔動作池)', default: `# 白色攝影棚背景，背景乾淨簡潔，專業人像棚拍燈光
 雙手叉腰優雅站立，自信地面對鏡頭
 微微側身，手輕輕撫摸著長髮
@@ -154,23 +158,14 @@
 @雙人
 兩人並排站立在白色棚景中央，手牽手微笑
 一人坐在高腳凳上，另一人雙手搭在她肩膀上，親密合照
-背靠背站立，眼神同時銳利地直視鏡頭
 
 # 背後是虛化的豪華酒店頂層夜景，都市霓虹閃爍
 慵懶的靠在椅子上，一隻手撐著臉
 優雅地站立，單手叉腰，眼神看向鏡頭
 手裡拿著香檳杯，微微歪頭微笑
-雙手扶著欄杆，眺望遠方的夜景
 @雙人
 兩人背靠背站立在露台，晚風吹拂
-情侶手牽手靠在欄杆邊，一起眺望繁華夜景
-
-# 清晰的黃昏沙灘背景，帶有金黃色的夕陽逆光
-赤腳在沙灘上奔跑，裙擺隨風飄動
-坐在沙灘上，雙手撐在背後看著落日
-@雙人
-手牽手在沙灘上漫步奔跑，裙擺隨風飄動
-並肩坐在沙灘上，看著落日，男生摟著女生的肩膀` },
+情侶手牽手靠在欄杆邊，一起眺望繁華夜景` },
         { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
     ];
 
@@ -189,7 +184,7 @@
             badgeArea.appendChild(badge);
         });
 
-        // 初始化後台設定框與其餘下拉選單
+        // 初始化後台設定框與下拉選單
         const configArea = document.getElementById('config-fields');
         configArea.innerHTML = ''; 
         items.forEach(item => {
@@ -203,19 +198,21 @@
 
             textarea.addEventListener('input', () => {
                 if (item.id === 'scene') renderSceneBadges();
+                else if (item.id === 'shoes') renderShoesBadges();
                 else updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
             });
             
-            if (item.id !== 'scene') {
+            if (item.id !== 'scene' && item.id !== 'shoes') {
                 const select = document.getElementById(`sel-${item.id}`);
                 select.addEventListener('change', () => updateResult());
                 updateDropdown(textarea, select, item.id);
             }
         });
 
-        // 初始動態渲染場景大 Badge 區
+        // 初始動態渲染場景與鞋子 Badge 區
         renderSceneBadges();
+        renderShoesBadges();
     }
 
     // 處理特徵複選
@@ -229,7 +226,49 @@
         updateResult();
     }
 
-    // 3.2 核心更新：將解析出嚟嘅場景自動渲染成 Badge，並支援動態點選切換
+    // 3.3 核心更新：將後台鞋子數據動態渲染成單選 Badge，預設全部 dim 灰色
+    function renderShoesBadges() {
+        const text = document.getElementById('cfg-shoes').value;
+        const lines = text.split('\n').filter(l => l.trim() !== '');
+        const shoesArea = document.getElementById('shoes-badges-area');
+        shoesArea.innerHTML = '';
+
+        // 如果之前選的鞋子在後台被刪除了，就清空選取狀態
+        if (selectedShoeName && !lines.includes(selectedShoeName)) {
+            selectedShoeName = '';
+        }
+
+        lines.forEach(shoe => {
+            const badge = document.createElement('div');
+            badge.className = 'custom-badge shoe-badge';
+            badge.innerText = shoe;
+
+            // 如果匹配到當前選中的鞋子，亮起藍色
+            if (shoe === selectedShoeName) {
+                badge.classList.add('active');
+            }
+
+            // 單選點擊邏輯
+            badge.onclick = () => {
+                // 如果點擊的是已經選中的鞋子，就取消選取（變回全 dim 狀態）
+                if (selectedShoeName === shoe) {
+                    selectedShoeName = '';
+                    badge.classList.remove('active');
+                } else {
+                    document.querySelectorAll('.shoe-badge').forEach(b => b.classList.remove('active'));
+                    badge.classList.add('active');
+                    selectedShoeName = shoe;
+                }
+                updateResult();
+            };
+
+            shoesArea.appendChild(badge);
+        });
+
+        updateResult();
+    }
+
+    // 動態場景渲染
     function renderSceneBadges() {
         const parsedScenes = parseScenes();
         const sceneArea = document.getElementById('scene-badges-area');
@@ -237,7 +276,6 @@
 
         if (parsedScenes.length === 0) return;
 
-        // 如果當前記錄的已選場景在列表裡找不到了，或者剛進網頁，就預設選第一個
         if (!selectedSceneName || !parsedScenes.some(p => p.name === selectedSceneName)) {
             selectedSceneName = parsedScenes[0].name;
         }
@@ -247,17 +285,15 @@
             badge.className = 'custom-badge scene-badge';
             badge.innerText = scene.name;
             
-            // 判斷是否為目前選中的背景
             if (scene.name === selectedSceneName) {
                 badge.classList.add('active');
             }
 
-            // 點擊事件：單選邏輯
             badge.onclick = () => {
                 document.querySelectorAll('.scene-badge').forEach(b => b.classList.remove('active'));
                 badge.classList.add('active');
                 selectedSceneName = scene.name;
-                rollActionForCurrentScene(); // 切換背景自動重新抽 10 個動作
+                rollActionForCurrentScene();
             };
 
             sceneArea.appendChild(badge);
@@ -340,7 +376,7 @@
     function updateResult() {
         const d = {};
         items.forEach(item => {
-            if (item.id !== 'scene') {
+            if (item.id !== 'scene' && item.id !== 'shoes') {
                 d[item.id] = document.getElementById(`sel-${item.id}`).value;
             }
         });
@@ -353,9 +389,12 @@
             finalFeatures += "，" + selectedExtraFeatures.join('、');
         }
 
+        // 3.3 處理鞋子部分的提示詞輸出。如果都沒選（全 dim），就輸出空字串，免得出現 undefined。
+        const shoePrompt = selectedShoeName ? `，${selectedShoeName}` : "";
+
         const template = `上傳的照片人物為原型${modeText}，幫我生成${d.count}張照片。
 人物特徵：${finalFeatures}${doubleLine}
-衣服：${d.dress}，${d.shoes}
+衣服：${d.dress}${shoePrompt}
 動作：${currentRandomAction}
 角度：${d.dist}
 場景：${selectedSceneName}
@@ -389,7 +428,6 @@
         }
     }
 
-    // 匯出功能 (完美包含場景數據)
     function exportConfig() {
         const data = {};
         items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
@@ -410,12 +448,13 @@
                 if (data[item.id]) {
                     document.getElementById(`cfg-${item.id}`).value = data[item.id];
                     localStorage.setItem(`cfg-${item.id}`, data[item.id]);
-                    if (item.id !== 'scene') {
+                    if (item.id !== 'scene' && item.id !== 'shoes') {
                         updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
                     }
                 }
             });
             renderSceneBadges();
+            renderShoesBadges();
             alert('導入成功！');
         };
         reader.readAsText(file);
