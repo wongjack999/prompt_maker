@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 3.4</title>
+    <title>AI Prompt Pro 3.6</title>
     <style>
         :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -100,14 +100,14 @@
         
         <!-- 雙人選項 (平時隱藏) -->
         <div class="select-group" id="group-twoperson" style="display: none;">
-            <label style="color: var(--warning);">6. 雙人描述 / 第二人互動</label>
-            <select id="sel-twoperson"></select>
+            <label style="color: var(--warning);">6. 雙人獨立動作與互動池 (自由換行增加，系統會自動隨機抽選)</label>
+            <textarea id="sel-twoperson-display" style="height: 100px; margin-top:5px;" readonly></textarea>
         </div>
 
-        <div class="select-group"><label>2. 衣服款式</label><select id="sel-dress"></select></div>
+        <div class="select-group"><label>2. 衣服款式 (輸出時會自動附加「極致輕薄」)</label><select id="sel-dress"></select></div>
         <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
         
-        <!-- 綁定動作池顯示框 -->
+        <!-- 5. 綁定動作池顯示框 -->
         <div class="select-group">
             <div class="action-badge-container">
                 <span id="badge-title">👤 已隨機挑選單人專屬動作：</span>
@@ -146,26 +146,20 @@
     let selectedShoeName = ''; 
 
     const items = [
-        { id: 'twoperson', label: '6. 雙人模式描述 (第二人與互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰' },
+        { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個通用雙人互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰\n兩人並排站立在場景中央，手牽手對鏡頭微笑\n一人坐在凳上，另一人雙手搭在她肩膀上親密合照\n兩人背靠背站立，晚風輕輕吹拂髮絲' },
         { id: 'dress', label: '2. 衣服款式', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
         { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋\n裸色魚口鞋' },
         { id: 'dist', label: '4. 鏡頭角度與距離', default: '第一人稱視角，中景鏡頭拍摄\n電影感特寫鏡頭，專注於面部細節與柔和眼神\n低角度仰拍，全身遠景鏡頭，突出現體比例' },
-        { id: 'scene', label: '5. 場景與背景 (格式: #場景名，可選用 @雙人 區隔動作池)', default: `# 白色攝影棚背景，背景乾淨簡潔，專業人像棚拍燈光
+        { id: 'scene', label: '5. 場景與背景 (格式: #場景名，下方直接放該場景專屬單人動作)', default: `# 白色攝影棚背景，背景乾淨簡潔，專業人像棚拍燈光
 雙手叉腰優雅站立，自信地面對鏡頭
 微微側身，手輕輕撫摸著長髮
 雙腿交疊坐在高腳凳上，眼神帶點高冷
 正面站立，身體微微前傾，雙手自然垂下
-@雙人
-兩人並排站立在白色棚景中央，手牽手微笑
-一人坐在高腳凳上，另一人雙手搭在她肩膀上，親密合照
 
 # 背後是虛化的豪華酒店頂層夜景，都市霓虹閃爍
 慵懶的靠在椅子上，一隻手撐著臉
 優雅地站立，單手叉腰，眼神看向鏡頭
-手裡拿著香檳杯，微微歪頭微笑
-@雙人
-兩人背靠背站立在露台，晚風吹拂
-情侶手牽手靠在欄杆邊，一起眺望繁華夜景` },
+手裡拿著香檳杯，微微歪頭微笑` },
         { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
     ];
 
@@ -173,7 +167,6 @@
     let currentRandomAction = '';
 
     function init() {
-        // 渲染特徵 Badge
         const badgeArea = document.getElementById('features-badges-area');
         badgeArea.innerHTML = '';
         EXTRA_FEATURE_POOL.forEach(feat => {
@@ -184,7 +177,6 @@
             badgeArea.appendChild(badge);
         });
 
-        // 初始化後台設定框與下拉選單
         const configArea = document.getElementById('config-fields');
         configArea.innerHTML = ''; 
         items.forEach(item => {
@@ -199,11 +191,12 @@
             textarea.addEventListener('input', () => {
                 if (item.id === 'scene') renderSceneBadges();
                 else if (item.id === 'shoes') renderShoesBadges();
+                else if (item.id === 'twoperson') syncDoublePersonDisplay();
                 else updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
             });
             
-            if (item.id !== 'scene' && item.id !== 'shoes') {
+            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson') {
                 const select = document.getElementById(`sel-${item.id}`);
                 select.addEventListener('change', () => updateResult());
                 updateDropdown(textarea, select, item.id);
@@ -212,6 +205,13 @@
 
         renderSceneBadges();
         renderShoesBadges();
+        syncDoublePersonDisplay();
+    }
+
+    function syncDoublePersonDisplay() {
+        const text = document.getElementById('cfg-twoperson').value;
+        document.getElementById('sel-twoperson-display').value = text;
+        if(isDoubleMode) rollActionForCurrentScene();
     }
 
     function toggleFeatureBadge(element, featureName) {
@@ -294,29 +294,25 @@
         rollActionForCurrentScene();
     }
 
+    // 3.6 徹底移除 @雙人 區隔，場景底下全視為單人動作
     function parseScenes() {
         const text = document.getElementById('cfg-scene').value;
         const lines = text.split('\n');
         const sceneList = [];
         let currentScene = null;
-        let isDoubleSection = false;
 
         lines.forEach(line => {
             const t = line.trim();
             if (!t) return;
 
             if (t.startsWith('#')) {
-                currentScene = { name: t.substring(1).trim(), singleActions: [], doubleActions: [] };
+                currentScene = { name: t.substring(1).trim(), singleActions: [] };
                 sceneList.push(currentScene);
-                isDoubleSection = false;
-            } else if (t.startsWith('@雙人')) {
-                isDoubleSection = true;
             } else {
                 if (currentScene) {
-                    if (isDoubleSection) currentScene.doubleActions.push(t);
-                    else currentScene.singleActions.push(t);
+                    currentScene.singleActions.push(t);
                 } else {
-                    currentScene = { name: '預設場景', singleActions: [t], doubleActions: [t] };
+                    currentScene = { name: '預設場景', singleActions: [t] };
                     sceneList.push(currentScene);
                 }
             }
@@ -332,21 +328,24 @@
         updateResult();
     }
 
+    // 3.6 核心架構升級：單人抽場景專屬動作，雙人直接抽通用獨立動作池
     function rollActionForCurrentScene() {
-        const parsedData = parseScenes();
-        const match = parsedData.find(p => p.name === selectedSceneName);
-        
         let pool = [];
         const badgeTitle = document.getElementById('badge-title');
 
-        if (match) {
-            if (isDoubleMode) {
-                pool = match.doubleActions.length > 0 ? [...match.doubleActions] : [...match.singleActions];
-                badgeTitle.innerText = "👥 已隨機挑選雙人專屬動作：";
-            } else {
+        if (isDoubleMode) {
+            // 雙人模式：直接讀取第 6 項「雙人通用動作池」
+            const text = document.getElementById('cfg-twoperson').value;
+            pool = text.split('\n').filter(l => l.trim() !== '');
+            badgeTitle.innerText = "👥 已從通用池隨機抽取出雙人動作：";
+        } else {
+            // 單人模式：綁定場景專屬動作池
+            const parsedData = parseScenes();
+            const match = parsedData.find(p => p.name === selectedSceneName);
+            if (match && match.singleActions) {
                 pool = [...match.singleActions];
-                badgeTitle.innerText = "👤 已隨機挑選單人專屬動作：";
             }
+            badgeTitle.innerText = "👤 已從當前場景隨機挑選單人動作：";
         }
         
         if (pool.length > 0) {
@@ -358,7 +357,7 @@
             }
             currentRandomAction = selectedActions.join('、');
         } else {
-            currentRandomAction = '自然放鬆的姿勢';
+            currentRandomAction = isDoubleMode ? '雙人親密合照，自然互動' : '自然放鬆的姿勢';
         }
         
         document.getElementById('current-action-display').innerText = currentRandomAction;
@@ -368,14 +367,14 @@
     function updateResult() {
         const d = {};
         items.forEach(item => {
-            if (item.id !== 'scene' && item.id !== 'shoes') {
+            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson') {
                 d[item.id] = document.getElementById(`sel-${item.id}`).value;
             }
         });
 
         const modeText = isDoubleMode ? "（雙人互動模式）" : "";
-        const doubleLine = isDoubleMode ? `\n雙人配合：${d.twoperson}` : "";
-
+        
+        // 3.6 提示詞輸出優化：如果是雙人模式，動作本身已經包含了雙人互動描述，因此不需要重複加雙人附加行
         let finalFeatures = BASE_FEATURES;
         if (selectedExtraFeatures.length > 0) {
             finalFeatures += "，" + selectedExtraFeatures.join('、');
@@ -383,9 +382,8 @@
 
         const shoePrompt = selectedShoeName ? `，${selectedShoeName}` : "";
 
-        // 3.4 核心修改：在此處直接鎖死「極致輕薄嘅」在衣服名稱前面
         const template = `上傳的照片人物為原型${modeText}，幫我生成${d.count}張照片。
-人物特徵：${finalFeatures}${doubleLine}
+人物特徵：${finalFeatures}
 衣服：極致輕薄的${d.dress}${shoePrompt}
 動作：${currentRandomAction}
 角度：${d.dist}
@@ -440,13 +438,14 @@
                 if (data[item.id]) {
                     document.getElementById(`cfg-${item.id}`).value = data[item.id];
                     localStorage.setItem(`cfg-${item.id}`, data[item.id]);
-                    if (item.id !== 'scene' && item.id !== 'shoes') {
+                    if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson') {
                         updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
                     }
                 }
             });
             renderSceneBadges();
             renderShoesBadges();
+            syncDoublePersonDisplay();
             alert('導入成功！');
         };
         reader.readAsText(file);
