@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 2.0</title>
+    <title>AI Prompt Pro 2.7</title>
     <style>
-        :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; }
+        :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-bottom: 160px; }
         
@@ -18,20 +18,34 @@
         .section { display: none; }
         .section.active { display: block; }
 
+        /* Mode Button Grid */
+        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+
         /* 按鈕樣式 */
-        .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-random { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.3); }
+        .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .btn-random { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2); }
+        
+        .btn-mode-single { background: #10b981; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
+        .btn-mode-double { background: var(--warning); color: white; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2); }
+        
         .btn-secondary { background: #64748b; color: white; font-size: 13px; margin-top: 10px; }
+        .btn-danger { background: var(--danger); color: white; font-size: 13px; margin-top: 10px; }
 
         /* Config Card */
         .config-card { background: white; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e5e7eb; }
         .config-card label { display: block; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-        textarea { width: 100%; height: 95px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; }
+        textarea { width: 100%; height: 110px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; }
 
         /* Select Group */
-        .select-group { margin-bottom: 16px; }
+        .select-group { margin-bottom: 16px; transition: 0.3s; }
         .select-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 600; }
         select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; background: white; color: #1e293b; }
+
+        /* 2.7 綁定動作小 Badge 樣式 */
+        .action-badge-container { display: flex; align-items: center; justify-content: space-between; background: #e0e7ff; padding: 10px 12px; border-radius: 10px; margin-top: 8px; font-size: 13px; color: #4338ca; border: 1px solid #c7d2fe; }
+        .action-badge-text { font-weight: bold; flex: 1; margin-left: 4px; margin-right: 8px; line-height: 1.3; }
+        .btn-reroll-action { background: white; border: 1px solid #b4c6fc; padding: 5px 10px; border-radius: 6px; color: #4f46e5; font-weight: bold; font-size: 12px; cursor: pointer; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-reroll-action:active { background: #f3f4f6; }
 
         /* Footer Preview */
         .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 16px; box-shadow: 0 -10px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; }
@@ -47,28 +61,48 @@
 </div>
 
 <div class="container">
+    <!-- 生成模式 -->
     <div id="section-gen" class="section active">
-        <button class="btn-action btn-random" onclick="randomize()">
-            <span>🎲</span> 隨機組合靈感
-        </button>
+        <div class="mode-grid">
+            <button class="btn-action btn-random" onclick="randomize()">🎲 隨機組合</button>
+            <button id="btn-mode-toggle" class="btn-action btn-mode-single" onclick="toggleMode()">👤 模式：單人</button>
+        </div>
 
         <div class="select-group"><label>1. 人物特徵</label><select id="sel-features"></select></div>
+        
+        <div class="select-group" id="group-twoperson" style="display: none;">
+            <label style="color: var(--warning);">6. 雙人描述 / 第二人互動</label>
+            <select id="sel-twoperson"></select>
+        </div>
+
         <div class="select-group"><label>2. 衣服款式</label><select id="sel-dress"></select></div>
         <div class="select-group"><label>3. 鞋子款式</label><select id="sel-shoes"></select></div>
-        <div class="select-group"><label>4. 動作姿勢</label><select id="sel-action"></select></div>
-        <div class="select-group"><label>5. 拍攝距離</label><select id="sel-dist"></select></div>
-        <div class="select-group"><label>6. 場景背景</label><select id="sel-scene"></select></div>
+        <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
+        
+        <!-- 5. 場景選擇（已包含隨機動作觸發） -->
+        <div class="select-group">
+            <label>5. 場景與背景氛圍</label>
+            <select id="sel-scene"></select>
+            <!-- 2.7 動態動作顯示區 -->
+            <div class="action-badge-container">
+                <span>🎬 隨機動作：</span>
+                <span id="current-action-display" class="action-badge-text">正在讀取...</span>
+                <button class="btn-reroll-action" onclick="rollActionForCurrentScene()">🎲 換個動作</button>
+            </div>
+        </div>
+        
         <div class="select-group"><label>生成數量</label><select id="sel-count"></select></div>
     </div>
 
+    <!-- 設定模式 -->
     <div id="section-cfg" class="section">
-        <div id="config-fields">
-            </div>
+        <div id="config-fields"></div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <button class="btn-action btn-secondary" onclick="exportConfig()">📤 匯出備份</button>
             <button class="btn-action btn-secondary" onclick="importConfig()">📥 導入備份</button>
         </div>
+        <button class="btn-action btn-danger" onclick="resetConfig()">⚠️ 恢復成官方預設文字</button>
         <input type="file" id="fileInput" style="display:none" onchange="handleFile(this)">
     </div>
 </div>
@@ -79,20 +113,25 @@
 </div>
 
 <script>
+    // 2.7 核心數據：移除了獨立的動作欄，整合進場景欄位
     const items = [
         { id: 'features', label: '1. 人物特徵', default: '高挑苗條，豐滿曲線、細腰、修長腿部、緊緻身材\n嬌小可愛，清純面孔、纖細身材' },
+        { id: 'twoperson', label: '6. 雙人模式描述 (第二人與互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰' },
         { id: 'dress', label: '2. 衣服款式', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
         { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋' },
-        { id: 'action', label: '4. 動作姿勢', default: '慵懶的靠在椅子上，椅子旁邊有扶手架著二郎腿，一隻手借助扶手撐著臉\n優雅地站立，單手叉腰，眼神看向鏡頭\n坐在窗台邊，雙手抱膝，望向窗外' },
-        { id: 'dist', label: '5. 拍攝距離', default: '中景\n近景\n全身' },
-        { id: 'scene', label: '6. 場景背景', default: '豪華酒店頂層\n黃昏下的沙灘\n復古咖啡廳' },
+        { id: 'dist', label: '4. 鏡頭角度與距離', default: '第一人稱視角，中景鏡頭拍攝\n電影感特寫鏡頭，專注於面部細節與柔和眼神\n低角度仰拍，全身遠景鏡頭，突出現體比例' },
+        // 智能場景綁定格式：場景名 | 動作 1 // 動作 2 // 動作 3 (可以寫幾十個)
+        { id: 'scene', label: '5. 場景與背景氛圍 (格式: 場景描述 | 動作1 // 動作2)', default: '背後是虛化的豪華酒店頂層夜景，都市霓虹閃爍 | 慵懶的靠在椅子上，一隻手撐著臉 // 優雅地站立，單手叉腰，眼神看向鏡頭 // 手裡拿著香檳杯，微微歪頭微笑\n清晰的黃昏沙灘背景，帶有金黃色的夕陽逆光 | 赤腳在沙灘上奔跑，裙擺隨風飄動 // 坐在沙灘上，雙手撐在背後看著落日 // 蹲在水中央，用手輕輕拍打海水\n復古咖啡廳室內環境，柔和的窗光灑落 | 坐在窗台邊，雙手抱膝，望向窗外 // 手托著腮，靜靜地看著面前的咖啡杯 // 正在翻閱一本精裝書，神情專注' },
         { id: 'count', label: '生成數量', default: '1\n4\n9' }
     ];
 
+    let isDoubleMode = false;
+    let currentRandomAction = ''; // 紀錄當前被抽中的動作
+
     function init() {
         const configArea = document.getElementById('config-fields');
+        configArea.innerHTML = ''; 
         items.forEach(item => {
-            // 動態創建 Config UI
             const card = document.createElement('div');
             card.className = 'config-card';
             card.innerHTML = `<label>${item.label}</label><textarea id="cfg-${item.id}"></textarea>`;
@@ -101,24 +140,74 @@
             const textarea = document.getElementById(`cfg-${item.id}`);
             const select = document.getElementById(`sel-${item.id}`);
 
-            // 讀取數據
             const saved = localStorage.getItem(`cfg-${item.id}`);
             textarea.value = saved ? saved : item.default;
 
             textarea.addEventListener('input', () => {
-                updateDropdown(textarea, select);
+                updateDropdown(textarea, select, item.id);
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
             });
-            select.addEventListener('change', updateResult);
-            updateDropdown(textarea, select);
+            
+            select.addEventListener('change', () => {
+                if (item.id === 'scene') {
+                    rollActionForCurrentScene(); // 切換場景時，自動重抽動作
+                } else {
+                    updateResult();
+                }
+            });
+            
+            updateDropdown(textarea, select, item.id);
         });
     }
 
-    function updateDropdown(textarea, select) {
+    function updateDropdown(textarea, select, id) {
         const lines = textarea.value.split('\n').filter(l => l.trim() !== '');
         const current = select.value;
-        select.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join('');
-        if (lines.includes(current)) select.value = current;
+        
+        if (id === 'scene') {
+            // 2.7 濾掉右邊嘅動作代碼，Dropdown 只顯示左邊嘅場景名
+            select.innerHTML = lines.map(l => {
+                const sceneName = l.split('|')[0].trim();
+                return `<option value="${sceneName}">${sceneName}</option>`;
+            }).join('');
+        } else {
+            select.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join('');
+        }
+        
+        if (lines.some(l => l.split('|')[0].trim() === current)) select.value = current;
+        
+        if (id === 'scene') {
+            rollActionForCurrentScene();
+        } else {
+            updateResult();
+        }
+    }
+
+    // 2.7 核心算法：抽取當前場景對應嘅隨機動作
+    function rollActionForCurrentScene() {
+        const sceneSelect = document.getElementById('sel-scene');
+        const sceneTextarea = document.getElementById('cfg-scene');
+        const selectedSceneName = sceneSelect.value;
+        
+        const lines = sceneTextarea.value.split('\n').filter(l => l.trim() !== '');
+        const matchingLine = lines.find(l => l.split('|')[0].trim() === selectedSceneName);
+        
+        if (matchingLine && matchingLine.includes('|')) {
+            const actionsPart = matchingLine.split('|')[1];
+            // 透過 // 切割成動作池陣列
+            const actions = actionsPart.split('//').map(a => a.trim()).filter(a => a !== '');
+            if (actions.length > 0) {
+                // 隨機抽一個
+                currentRandomAction = actions[Math.floor(Math.random() * actions.length)];
+            } else {
+                currentRandomAction = '自然放鬆的姿勢';
+            }
+        } else {
+            currentRandomAction = '自然放鬆的姿勢';
+        }
+        
+        // 即時反映喺前台介面
+        document.getElementById('current-action-display').innerText = currentRandomAction;
         updateResult();
     }
 
@@ -126,28 +215,53 @@
         const d = {};
         items.forEach(item => d[item.id] = document.getElementById(`sel-${item.id}`).value);
 
-        const template = `上傳的照片人物為原型，幫我生成${d.count}張照片。
-人物特徵：${d.features}
+        const modeText = isDoubleMode ? "（雙人互動模式）" : "";
+        const doubleLine = isDoubleMode ? `\n雙人配合：${d.twoperson}` : "";
+
+        const template = `上傳的照片人物為原型${modeText}，幫我生成${d.count}張照片。
+人物特徵：${d.features}${doubleLine}
 衣服：${d.dress}，${d.shoes}
-動作：${d.action}
-角度：第一人稱視角，${d.dist}距離特寫
-場景：虛化的${d.scene}背景
-品質：超寫實8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16`;
+動作：${currentRandomAction}
+角度：${d.dist}
+場景：${d.scene}
+品質：超寫實 8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16`;
 
         document.getElementById('final-output').innerText = template;
     }
 
-    // 2.0 隨機組合
     function randomize() {
         items.forEach(item => {
             const select = document.getElementById(`sel-${item.id}`);
             const count = select.options.length;
             if (count > 0) select.selectedIndex = Math.floor(Math.random() * count);
         });
+        rollActionForCurrentScene(); // 總隨機時也會刷新動作
+    }
+
+    function toggleMode() {
+        isDoubleMode = !isDoubleMode;
+        const btn = document.getElementById('btn-mode-toggle');
+        const doubleGroup = document.getElementById('group-twoperson');
+        if (isDoubleMode) {
+            btn.innerText = '👥 模式：雙人';
+            btn.className = 'btn-action btn-mode-double';
+            doubleGroup.style.display = 'block';
+        } else {
+            btn.innerText = '👤 模式：單人';
+            btn.className = 'btn-action btn-mode-single';
+            doubleGroup.style.display = 'none';
+        }
         updateResult();
     }
 
-    // 2.0 備份匯出
+    function resetConfig() {
+        if (confirm('確定要恢復官方預設文字嗎？這會覆蓋你手機上目前的修改。')) {
+            items.forEach(item => localStorage.removeItem(`cfg-${item.id}`));
+            init();
+            alert('已成功恢復預設值！');
+        }
+    }
+
     function exportConfig() {
         const data = {};
         items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
@@ -158,7 +272,6 @@
         a.click();
     }
 
-    // 2.0 備份導入
     function importConfig() { document.getElementById('fileInput').click(); }
     function handleFile(input) {
         const file = input.files[0];
@@ -169,7 +282,7 @@
                 if (data[item.id]) {
                     document.getElementById(`cfg-${item.id}`).value = data[item.id];
                     localStorage.setItem(`cfg-${item.id}`, data[item.id]);
-                    updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`));
+                    updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
                 }
             });
             alert('導入成功！');
