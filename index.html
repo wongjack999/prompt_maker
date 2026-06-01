@@ -3,127 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 3.8</title>
+    <title>AI Prompt Pro 5.3</title>
     <style>
-        :root { --primary: #4f46e5; --bg: #f3f4f6; --accent: #ec4899; --warning: #f59e0b; --danger: #ef4444; }
+        :root { --primary: #6366f1; --primary-light: #f0f2ff; --bg: #f8fafc; --warning: #f59e0b; --danger: #ef4444; --text-main: #0f172a; --text-sub: #64748b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding-bottom: 160px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); margin: 0; padding-bottom: 180px; color: var(--text-main); }
         
-        /* Tab Navigation */
-        .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .tab { flex: 1; text-align: center; padding: 16px; font-weight: bold; color: #94a3b8; border-bottom: 3px solid transparent; transition: 0.3s; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        /* Tab 導航 */
+        .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .tab { flex: 1; text-align: center; padding: 16px; font-weight: 700; color: #94a3b8; border-bottom: 3px solid transparent; transition: 0.2s; font-size: 14px; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
 
-        .container { padding: 15px; }
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
         .section { display: none; }
         .section.active { display: block; }
 
-        /* Boolean Switch 區域 */
-        .switch-container { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .switch-label { font-size: 15px; font-weight: bold; color: #1e293b; display: flex; align-items: center; gap: 8px; }
-        
-        /* Switch 核心樣式 */
+        .step-label { font-size: 13px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin: 18px 0 8px 2px; display: block; }
+
+        /* 模式切換 */
+        .switch-banner { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+        .switch-label { font-size: 15px; font-weight: 800; }
         .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--warning); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* Dim State 通用按鈕排版 */
-        .badge-grid-label { font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px; display: block; }
-        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-        .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #cbd5e1; background: #e2e8f0; color: #64748b; transition: all 0.2s ease; user-select: none; }
-        
-        /* Active 狀態亮起 (特徵、鞋子) */
-        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); font-weight: bold; }
-        
-        /* 場景專用樣式（藍色亮起） */
-        .custom-badge.scene-badge.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25); }
+        /* 膠囊 Badge */
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: white; color: var(--text-sub); transition: 0.2s; }
+        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; transition: 0.2s; }
-        .btn-secondary { background: #64748b; color: white; font-size: 13px; margin-top: 10px; }
-        .btn-danger { background: var(--danger); color: white; font-size: 13px; margin-top: 10px; }
+        /* 🏃‍♂️ 核心亮點：衣服專用主頁面橫向極速 Slider */
+        .slider-container { display: flex; overflow-x: auto; gap: 10px; padding: 4px 2px 10px 2px; margin-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* 隱藏原生冷酷嘅 Scrollbar，令畫面有原生 App 質感 */
+        .slider-container::-webkit-scrollbar { display: none; }
+        .slider-container { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Config Card */
-        .config-card { background: white; padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e5e7eb; }
-        .config-card label { display: block; font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-        textarea { width: 100%; height: 140px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font-size: 14px; background: #f9fafb; resize: none; line-height: 1.4; }
+        .slider-card { flex: 0 0 110px; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; border: 2px solid #e2e8f0; cursor: pointer; background: white; display: flex; align-items: center; justify-content: center; padding: 10px; font-size: 12px; font-weight: 600; text-align: center; color: var(--text-sub); transition: 0.15s; position: relative; scroll-snap-align: start; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+        .slider-card img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        .slider-card.active { border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); transform: translateY(-2px); }
+        .slider-card.active::after { content: "✓"; position: absolute; top: 6px; right: 6px; background: var(--primary); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
 
-        /* Select Group */
-        .select-group { margin-bottom: 16px; transition: 0.3s; }
-        .select-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 600; }
-        select { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 16px; background: white; color: #1e293b; }
+        /* 普通觸發鈕 (留番畀項目較少嘅鏡頭視角) */
+        .picker-trigger { background: white; padding: 14px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 12px; }
+        .picker-trigger .val { font-size: 14px; font-weight: 700; color: var(--primary); }
 
-        /* 綁定動作小 Badge */
-        .action-badge-container { display: flex; flex-direction: column; align-items: flex-start; background: #e0e7ff; padding: 12px; border-radius: 10px; margin-top: 8px; font-size: 13px; color: #4338ca; border: 1px solid #c7d2fe; gap: 8px; }
-        .action-badge-text { font-weight: bold; line-height: 1.4; color: #1e1b4b; background: rgba(255,255,255,0.6); padding: 6px 10px; border-radius: 6px; width: 100%; }
-        .btn-reroll-action { background: white; border: 1px solid #b4c6fc; padding: 6px 12px; border-radius: 6px; color: #4f46e5; font-weight: bold; font-size: 12px; cursor: pointer; align-self: flex-end; }
+        /* 隨機動作激發器 */
+        .machine-card { background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); padding: 14px; border-radius: 14px; border: 1px solid #d8b4fe; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+        .machine-text { font-size: 13px; font-weight: 700; color: #581c87; line-height: 1.5; background: rgba(255,255,255,0.7); padding: 10px 12px; border-radius: 10px; min-height: 48px; }
+        .btn-spin { background: #7c3aed; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
 
-        /* Footer Preview */
-        .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 16px; box-shadow: 0 -10px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; }
-        .output-text { color: #cbd5e1; font-size: 12px; line-height: 1.5; max-height: 65px; overflow-y: auto; margin-bottom: 12px; white-space: pre-wrap; }
-        .btn-copy { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; }
+        .inline-row { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px 16px; border-radius: 14px; border: 1px solid #e2e8f0; margin-top: 15px; }
+        .inline-row label { font-size: 14px; font-weight: 700; }
+        .inline-row select { padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: bold; background: #f8fafc; }
+
+        /* 📱 底部 Drawer (得返鏡頭視角會用) */
+        .drawer-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; opacity: 0; transition: opacity 0.25s ease; backdrop-filter: blur(2px); }
+        .bottom-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: white; z-index: 2001; transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px 20px 0 0; max-height: 50vh; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; }
+        .bottom-drawer.open { transform: translateY(0); }
+        .drawer-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; background: #fafafa; border-radius: 20px 20px 0 0; }
+        .drawer-title { font-size: 15px; font-weight: 800; }
+        .drawer-close { background: #e2e8f0; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .drawer-content { overflow-y: auto; padding: 10px 16px 30px 16px; }
+        .drawer-item { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; border-radius: 10px; margin-top: 4px; font-size: 14px; }
+        .drawer-item.active { background: var(--primary-light); color: var(--primary); font-weight: 700; }
+
+        /* 後台配置 */
+        .config-card { background: white; padding: 16px; border-radius: 14px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+        .config-card label { display: block; font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+        textarea { width: 100%; height: 110px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-size: 13px; background: #f8fafc; resize: none; line-height: 1.4; }
+        .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .btn-secondary { background: #64748b; color: white; margin-top: 8px; }
+        .btn-danger { background: var(--danger); color: white; margin-top: 8px; }
+
+        .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 14px 16px; box-shadow: 0 -8px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; max-width: 600px; margin: 0 auto; }
+        .output-text { color: #94a3b8; font-size: 12px; max-height: 60px; overflow-y: auto; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
+        .btn-copy { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; }
     </style>
 </head>
 <body>
 
 <div class="tabs">
-    <div class="tab active" onclick="switchTab(0)">生成模式</div>
-    <div class="tab" onclick="switchTab(1)">管理選項</div>
+    <div class="tab active" onclick="switchTab(0)">✨ 智能極速面板</div>
+    <div class="tab" onclick="switchTab(1)">⚙️ 數據預設</div>
 </div>
 
 <div class="container">
-    <!-- 生成模式 -->
     <div id="section-gen" class="section active">
         
-        <!-- Boolean Switcher -->
-        <div class="switch-container">
-            <span class="switch-label" id="switch-status-text">👤 當前模式：單人</span>
+        <div class="switch-banner">
+            <span class="switch-label" id="switch-status-text">👤 當前：單人生成模式</span>
             <label class="switch">
                 <input type="checkbox" id="mode-checkbox" onchange="toggleMode(this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
 
-        <!-- 自由加選特徵區 (Dim State 複選) -->
-        <span class="badge-grid-label">加選附加特徵 (可多選)：</span>
+        <span class="step-label">🧬 附加特徵多選</span>
         <div class="badge-grid" id="features-badges-area"></div>
         
-        <!-- 鞋子款式變身 Badge 點選區 (單選，預設全 dim) -->
-        <span class="badge-grid-label">3. 鞋子款式 (單選)：</span>
+        <span class="step-label">👗 衣服款式 (左右滑動 • 一擊直選)</span>
+        <div class="slider-container" id="dress-slider-container"></div>
+
+        <span class="step-label">👠 鞋子配搭</span>
         <div class="badge-grid" id="shoes-badges-area"></div>
 
-        <!-- 動態場景背景 Badge 點選區 (單選) -->
-        <span class="badge-grid-label">5. 選擇場景與背景 (單選)：</span>
+        <span class="step-label">🎬 環境場景</span>
         <div class="badge-grid" id="scene-badges-area"></div>
-
-        <div class="select-group"><label>2. 衣服款式 (輸出時會自動附加「極致輕薄」)</label><select id="sel-dress"></select></div>
-        <div class="select-group"><label>4. 鏡頭角度與距離</label><select id="sel-dist"></select></div>
         
-        <!-- 5. 綁定動作池顯示框 (單/雙人模式結果都會在這邊完美呈現) -->
-        <div class="select-group">
-            <div class="action-badge-container">
-                <span id="badge-title">👤 已隨機挑選單人專屬動作：</span>
-                <div id="current-action-display" class="action-badge-text">正在讀取...</div>
-                <button class="btn-reroll-action" onclick="rollActionForCurrentScene()">🎲 重新抽動作</button>
-            </div>
+        <div class="machine-card">
+            <span id="badge-title" style="font-size: 12px; font-weight: 800; color: #6b21a8;">🚀 隨機動作激發器</span>
+            <div id="current-action-display" class="machine-text">正在就緒...</div>
+            <button class="btn-spin" onclick="rollActionForCurrentScene()">🎲 重新抽動作提示詞</button>
         </div>
         
-        <div class="select-group"><label>生成數量</label><select id="sel-count"></select></div>
+        <span class="step-label">📸 鏡頭視角</span>
+        <div class="picker-trigger" onclick="openDrawerPicker('dist')">
+            <span id="lbl-current-dist" class="val">讀取中...</span>
+            <span style="color: #94a3b8; font-size: 14px;">▾</span>
+        </div>
+
+        <div class="inline-row">
+            <label>🖼️ 相片產出數量</label>
+            <select id="sel-count"></select>
+        </div>
     </div>
 
-    <!-- 設定模式 -->
     <div id="section-cfg" class="section">
         <div id="config-fields"></div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <button class="btn-action btn-secondary" onclick="exportConfig()">📤 匯出備份</button>
             <button class="btn-action btn-secondary" onclick="importConfig()">📥 導入備份</button>
         </div>
-        <button class="btn-action btn-danger" onclick="resetConfig()">⚠️ 恢復成官方預設文字</button>
+        <button class="btn-action btn-danger" onclick="resetConfig()">⚠️ 恢復成客製化官方文字</button>
         <input type="file" id="fileInput" style="display:none" onchange="handleFile(this)">
     </div>
+</div>
+
+<div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawerPicker()"></div>
+<div id="bottom-drawer" class="bottom-drawer">
+    <div class="drawer-header">
+        <span id="drawer-title" class="drawer-title">請選擇一項</span>
+        <button class="drawer-close" onclick="closeDrawerPicker()">✕</button>
+    </div>
+    <div id="drawer-content" class="drawer-content"></div>
 </div>
 
 <div class="footer-preview">
@@ -132,262 +157,248 @@
 </div>
 
 <script>
-    const BASE_FEATURES = "皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
-    
-    let selectedExtraFeatures = [];
-    let selectedSceneName = ''; 
-    let selectedShoeName = ''; 
+    const BASE_FEATURES = "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
+    let selectedExtraFeatures = [], selectedSceneName = '', selectedShoeName = '', selectedDressLine = '', selectedDistLine = '';
+    let isDoubleMode = false, currentRandomAction = '';
 
     const items = [
-        { id: 'features', label: '7. 附加特徵池 (每行一個，前台多選 Badge)', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n全身沾有濃稠凡士林' },
-        { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個通用雙人互動)', default: '兩位親密的閨蜜合照，另一位留著俐落黑色短髮，兩人一起對著鏡頭開心微笑\n情侶親密互動，另一位是高大帥氣的男生，眼神充滿溫柔，輕輕摟著她的細腰\n兩人並排站立在場景中央，手牽手對鏡頭微笑\n一人坐在凳上，另一人雙手搭在她肩膀上親密合照\n兩人背靠背站立，晚風輕輕吹拂髮絲' },
-        { id: 'dress', label: '2. 衣服款式', default: '絲綢吊帶長裙\n黑色包臀短裙\n法式碎花洋裙' },
-        { id: 'shoes', label: '3. 鞋子款式', default: '細跟高跟鞋\n一字帶涼鞋\n黑色波鞋\n裸色魚口鞋' },
-        { id: 'dist', label: '4. 鏡頭角度與距離', default: '第一人稱視角，中景鏡頭拍摄\n電影感特寫鏡頭，專注於面部細節與柔和眼神\n低角度仰拍，全身遠景鏡頭，突出現體比例' },
-        { id: 'scene', label: '5. 場景與背景 (格式: #場景名，下方直接放該場景專屬單人動作)', default: `# 白色攝影棚背景，背景乾淨簡潔，專業人像棚拍燈光
-雙手叉腰優雅站立，自信地面對鏡頭
-微微側身，手輕輕撫摸著長髮
-雙腿交疊坐在高腳凳上，眼神帶點高冷
-正面站立，身體微微前傾，雙手自然垂下
-
-# 背後是虛化的豪華酒店頂層夜景，都市霓虹閃爍
-慵懶的靠在椅子上，一隻手撐著臉
-優雅地站立，單手叉腰，眼神看向鏡頭
-手裡拿著香檳杯，微微歪頭微笑` },
+        { id: 'features', label: '7. 附加特徵池 (每行一個)', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n黑色金屬手扣\n全身沾有濃稠凡士林' },
+        { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個)', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力神陷進其胯間衣料中，將其狠狠向後扣緊，兩人的雙腿在重力下完全交疊' },
+        { id: 'dress', label: '2. 衣服款式 (格式: 圖片網址 | 提示詞)', default: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300 | 黑白侍女風穿搭，帶女僕頭飾、領結同小蕾絲圍裙元素\nhttps://images.unsplash.com/photo-1621184455862-c163dfb30e0f?w=300 | 淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡、珍珠元素\nhttps://images.unsplash.com/photo-1612336307429-8a898d10e223?w=300 | 白色低領短袖，黑色窄裙，深色尼龍連褲襪，領口綁藍白絲巾\nhttps://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300 | 無袖高領白色針織上衣、灰色緊身短裙、深色尼龍連褲襪\n灰色開襟襯衫、黑色領結、黑色短裙\n短袖開襟白襯衫、黑色緊身短裙\n開襟白色長袖雪紡襯衫，灰色超短裙\n貼身深灰西裝配深色尼龍連褲襪\n貼身西裝馬甲配灰色超短裙\n白色短袖襯衫長裙，細長藍色絲帶\n貼身泳池穿搭，粉色系三件式綁帶風格\n黑色兩件式內搭，蕾絲露腰風格，吊帶襪\n白色兩件式內搭，蕾絲露腰風格，小護士帽' },
+        { id: 'shoes', label: '3. 鞋子款式', default: '光腳無鞋子\n黑色高跟鞋\n黑色高跟涼鞋\n白襪' },
+        { id: 'dist', label: '4. 鏡頭角度與距離', default: '極致臉部大特寫，臉部占畫面50%以上\n中景\n近景\n俯視全身超廣角\n仰視全身超廣角' },
+        { id: 'scene', label: '5. 場景與背景', default: `# 攝影棚白色背景
+# 辦公室
+獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭
+手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態
+站在落地窗前微側身，眺望遠方
+# 酒店房間
+# 教室
+# 室內運動場
+# 戶外游泳池` },
         { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
     ];
-
-    let isDoubleMode = false;
-    let currentRandomAction = '';
 
     function init() {
         const configArea = document.getElementById('config-fields');
         configArea.innerHTML = ''; 
-        
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = 'config-card';
             card.innerHTML = `<label>${item.label}</label><textarea id="cfg-${item.id}"></textarea>`;
             configArea.appendChild(card);
-
             const textarea = document.getElementById(`cfg-${item.id}`);
             textarea.value = localStorage.getItem(`cfg-${item.id}`) || item.default;
-
             textarea.addEventListener('input', () => {
-                if (item.id === 'scene') renderSceneBadges();
-                else if (item.id === 'shoes') renderShoesBadges();
-                else if (item.id === 'features') renderFeaturesBadges();
-                else if (item.id === 'twoperson' && isDoubleMode) rollActionForCurrentScene();
-                else if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
-                    updateDropdown(textarea, document.getElementById(`sel-${item.id}`), item.id);
-                }
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
+                syncDataFromConfig();
             });
-            
-            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
-                const select = document.getElementById(`sel-${item.id}`);
-                select.addEventListener('change', () => updateResult());
-                updateDropdown(textarea, select, item.id);
-            }
         });
+        syncDataFromConfig();
+        document.getElementById('sel-count').addEventListener('change', updateResult);
+        rollActionForCurrentScene();
+    }
+
+    function parseLineData(line) {
+        if (!line) return { img: '', text: '' };
+        if (line.includes('|')) {
+            const parts = line.split('|');
+            return { img: parts[0].trim(), text: parts[1].trim() };
+        }
+        return { img: '', text: line.trim() };
+    }
+
+    function syncDataFromConfig() {
+        // ⚡ 核心渲染：刷新主頁衣服 Slider 傳送帶
+        renderClothesSlider();
+
+        // 同步鏡頭視角
+        const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
+        if(!selectedDistLine || !distLines.includes(selectedDistLine)) selectedDistLine = distLines[0] || '';
+        document.getElementById('lbl-current-dist').innerText = parseLineData(selectedDistLine).text;
+
+        const countSelect = document.getElementById('sel-count');
+        const currCount = countSelect.value;
+        const countLines = document.getElementById('cfg-count').value.split('\n').filter(l=>l.trim());
+        countSelect.innerHTML = countLines.map(l=>`<option value="${l}">${l}</option>`).join('');
+        if(countLines.includes(currCount)) countSelect.value = currCount;
 
         renderFeaturesBadges();
-        renderSceneBadges();
         renderShoesBadges();
-        rollActionForCurrentScene();
+        renderSceneBadges();
+        updateResult();
+    }
+
+    /* ⚡ 橫向 Slider 生態引擎：直接喺主頁塞爆視覺卡片 */
+    function renderClothesSlider() {
+        const container = document.getElementById('dress-slider-container');
+        container.innerHTML = '';
+        const lines = document.getElementById('cfg-dress').value.split('\n').filter(l=>l.trim());
+        
+        if(!selectedDressLine || !lines.includes(selectedDressLine)) selectedDressLine = lines[0] || '';
+
+        lines.forEach(line => {
+            const data = parseLineData(line);
+            const card = document.createElement('div');
+            card.className = 'slider-card' + (line === selectedDressLine ? ' active' : '');
+            
+            if(data.img) {
+                // 有圖顯示大卡片，不污染文字空間
+                const img = document.createElement('img');
+                img.src = data.img;
+                card.appendChild(img);
+            } else {
+                // 無圖時文字卡片無縫補位
+                card.innerText = data.text;
+            }
+            
+            card.onclick = () => {
+                selectedDressLine = line;
+                document.querySelectorAll('.slider-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                updateResult();
+            };
+            container.appendChild(card);
+        });
+    }
+
+    /* 📱 輕量級 Bottom Sheet (只留畀少選項嘅鏡頭角) */
+    function openDrawerPicker(type) {
+        const overlay = document.getElementById('drawer-overlay');
+        const drawer = document.getElementById('bottom-drawer');
+        const title = document.getElementById('drawer-title');
+        const content = document.getElementById('drawer-content');
+        content.innerHTML = '';
+        
+        title.innerText = '📸 選擇鏡頭角度';
+        const lines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
+        lines.forEach(line => {
+            const data = parseLineData(line);
+            const div = document.createElement('div');
+            div.className = 'drawer-item' + (line === selectedDistLine ? ' active' : '');
+            div.innerHTML = data.text;
+            div.onclick = () => {
+                selectedDistLine = line;
+                closeDrawerPicker();
+                syncDataFromConfig();
+            };
+            content.appendChild(div);
+        });
+
+        overlay.style.display = 'block';
+        setTimeout(() => { overlay.style.opacity = '1'; drawer.classList.add('open'); }, 10);
+    }
+
+    function closeDrawerPicker() {
+        const overlay = document.getElementById('drawer-overlay');
+        const drawer = document.getElementById('bottom-drawer');
+        overlay.style.opacity = '0'; drawer.classList.remove('open');
+        setTimeout(() => { overlay.style.display = 'none'; }, 250);
     }
 
     function renderFeaturesBadges() {
-        const text = document.getElementById('cfg-features').value;
-        const pool = text.split('\n').filter(l => l.trim() !== '');
-        const badgeArea = document.getElementById('features-badges-area');
-        badgeArea.innerHTML = '';
-
+        const pool = document.getElementById('cfg-features').value.split('\n').filter(l=>l.trim());
+        const area = document.getElementById('features-badges-area');
+        area.innerHTML = '';
         selectedExtraFeatures = selectedExtraFeatures.filter(f => pool.includes(f));
-
         pool.forEach(feat => {
-            const badge = document.createElement('div');
-            badge.className = 'custom-badge feature-badge';
-            badge.innerText = feat;
-
-            if (selectedExtraFeatures.includes(feat)) {
-                badge.classList.add('active');
-            }
-
-            badge.onclick = () => {
-                badge.classList.toggle('active');
-                if (badge.classList.contains('active')) {
-                    selectedExtraFeatures.push(feat);
-                } else {
-                    selectedExtraFeatures = selectedExtraFeatures.filter(f => f !== feat);
-                }
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (selectedExtraFeatures.includes(feat) ? ' active' : '');
+            b.innerText = feat;
+            b.onclick = () => {
+                b.classList.toggle('active');
+                selectedExtraFeatures = b.classList.contains('active') ? [...selectedExtraFeatures, feat] : selectedExtraFeatures.filter(f=>f!==feat);
                 updateResult();
             };
-            badgeArea.appendChild(badge);
+            area.appendChild(b);
         });
-
-        updateResult();
     }
 
     function renderShoesBadges() {
-        const text = document.getElementById('cfg-shoes').value;
-        const lines = text.split('\n').filter(l => l.trim() !== '');
-        const shoesArea = document.getElementById('shoes-badges-area');
-        shoesArea.innerHTML = '';
-
-        if (selectedShoeName && !lines.includes(selectedShoeName)) {
-            selectedShoeName = '';
-        }
-
-        lines.forEach(shoe => {
-            const badge = document.createElement('div');
-            badge.className = 'custom-badge shoe-badge';
-            badge.innerText = shoe;
-
-            if (shoe === selectedShoeName) {
-                badge.classList.add('active');
-            }
-
-            badge.onclick = () => {
-                if (selectedShoeName === shoe) {
-                    selectedShoeName = '';
-                    badge.classList.remove('active');
-                } else {
-                    document.querySelectorAll('.shoe-badge').forEach(b => b.classList.remove('active'));
-                    badge.classList.add('active');
-                    selectedShoeName = shoe;
-                }
+        const pool = document.getElementById('cfg-shoes').value.split('\n').filter(l=>l.trim());
+        const area = document.getElementById('shoes-badges-area');
+        area.innerHTML = '';
+        if(selectedShoeName && !pool.includes(selectedShoeName)) selectedShoeName = '';
+        pool.forEach(shoe => {
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (shoe === selectedShoeName ? ' active' : '');
+            b.innerText = shoe;
+            b.onclick = () => {
+                document.querySelectorAll('#shoes-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
+                if(selectedShoeName === shoe) { selectedShoeName = ''; } else { b.classList.add('active'); selectedShoeName = shoe; }
                 updateResult();
             };
-
-            shoesArea.appendChild(badge);
+            area.appendChild(b);
         });
-
-        updateResult();
     }
 
     function renderSceneBadges() {
-        const parsedScenes = parseScenes();
-        const sceneArea = document.getElementById('scene-badges-area');
-        sceneArea.innerHTML = '';
-
-        if (parsedScenes.length === 0) return;
-
-        if (!selectedSceneName || !parsedScenes.some(p => p.name === selectedSceneName)) {
-            selectedSceneName = parsedScenes[0].name;
-        }
-
-        parsedScenes.forEach(scene => {
-            const badge = document.createElement('div');
-            badge.className = 'custom-badge scene-badge';
-            badge.innerText = scene.name;
-            
-            if (scene.name === selectedSceneName) {
-                badge.classList.add('active');
-            }
-
-            badge.onclick = () => {
-                document.querySelectorAll('.scene-badge').forEach(b => b.classList.remove('active'));
-                badge.classList.add('active');
-                selectedSceneName = scene.name;
+        const parsed = parseScenes();
+        const area = document.getElementById('scene-badges-area');
+        area.innerHTML = '';
+        if(!parsed.length) return;
+        if(!selectedSceneName || !parsed.some(p=>p.name === selectedSceneName)) selectedSceneName = parsed[0].name;
+        parsed.forEach(sc => {
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (sc.name === selectedSceneName ? ' active' : '');
+            b.innerText = sc.name;
+            b.onclick = () => {
+                document.querySelectorAll('#scene-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
+                b.classList.add('active'); selectedSceneName = sc.name;
                 rollActionForCurrentScene();
             };
-
-            sceneArea.appendChild(badge);
+            area.appendChild(b);
         });
-
-        rollActionForCurrentScene();
     }
 
     function parseScenes() {
-        const text = document.getElementById('cfg-scene').value;
-        const lines = text.split('\n');
-        const sceneList = [];
-        let currentScene = null;
-
-        lines.forEach(line => {
-            const t = line.trim();
-            if (!t) return;
-
-            if (t.startsWith('#')) {
-                currentScene = { name: t.substring(1).trim(), singleActions: [] };
-                sceneList.push(currentScene);
-            } else {
-                if (currentScene) {
-                    currentScene.singleActions.push(t);
-                } else {
-                    currentScene = { name: '預設場景', singleActions: [t] };
-                    sceneList.push(currentScene);
-                }
-            }
+        const lines = document.getElementById('cfg-scene').value.split('\n');
+        const list = []; let cur = null;
+        lines.forEach(l => {
+            const t = l.trim(); if(!t) return;
+            if(t.startsWith('#')) { cur = { name: t.substring(1).trim(), actions: [] }; list.push(cur); }
+            else { if(cur) cur.actions.push(t); else list.push({ name: '預設場景', actions: [t] }); }
         });
-        return sceneList;
-    }
-
-    function updateDropdown(textarea, select, id) {
-        const current = select.value;
-        const lines = textarea.value.split('\n').filter(l => l.trim() !== '');
-        select.innerHTML = lines.map(l => `<option value="${l}">${l}</option>`).join('');
-        if (lines.includes(current)) select.value = current;
-        updateResult();
+        return list;
     }
 
     function rollActionForCurrentScene() {
         let pool = [];
-        const badgeTitle = document.getElementById('badge-title');
-
-        if (isDoubleMode) {
-            // 雙人模式下：直接去讀後台資料，絕不在前台安插多餘 DOM 輸入框
-            const text = document.getElementById('cfg-twoperson').value;
-            pool = text.split('\n').filter(l => l.trim() !== '');
-            badgeTitle.innerText = "👥 已從通用池隨機抽取出雙人動作：";
+        const title = document.getElementById('badge-title');
+        if(isDoubleMode) {
+            pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
+            title.innerText = "👥 抽籤中：雙人專屬動作池";
         } else {
-            const parsedData = parseScenes();
-            const match = parsedData.find(p => p.name === selectedSceneName);
-            if (match && match.singleActions) {
-                pool = [...match.singleActions];
-            }
-            badgeTitle.innerText = "👤 已從當前場景隨機挑選單人動作：";
+            const match = parseScenes().find(p=>p.name === selectedSceneName);
+            if(match) pool = [...match.actions];
+            title.innerText = `👤 抽籤中：${selectedSceneName} 動作`;
         }
-        
-        if (pool.length > 0) {
-            let selectedActions = [];
-            const targetCount = Math.min(10, pool.length);
-            for(let i = 0; i < targetCount; i++) {
-                const randomIndex = Math.floor(Math.random() * pool.length);
-                selectedActions.push(pool.splice(randomIndex, 1)[0]);
-            }
-            currentRandomAction = selectedActions.join('、');
+        if(pool.length > 0) {
+            let res = []; const maxRoll = Math.min(10, pool.length);
+            for(let i=0; i<maxRoll; i++) { res.push(pool.splice(Math.floor(Math.random()*pool.length), 1)[0]); }
+            currentRandomAction = res.join('、');
         } else {
-            currentRandomAction = isDoubleMode ? '雙人親密合照，自然互動' : '不同姿勢';
+            currentRandomAction = isDoubleMode ? '雙人親密合照，自然互動' : '自然放鬆的姿勢';
         }
-        
         document.getElementById('current-action-display').innerText = currentRandomAction;
         updateResult();
     }
 
     function updateResult() {
-        const d = {};
-        items.forEach(item => {
-            if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
-                d[item.id] = document.getElementById(`sel-${item.id}`).value;
-            }
-        });
-
+        const countVal = document.getElementById('sel-count').value || '10';
         const modeText = isDoubleMode ? "（雙人互動模式）" : "";
-        
-        let finalFeatures = BASE_FEATURES;
-        if (selectedExtraFeatures.length > 0) {
-            finalFeatures += "，" + selectedExtraFeatures.join('、');
-        }
-
+        let finalFeat = BASE_FEATURES;
+        if(selectedExtraFeatures.length > 0) finalFeat += "，" + selectedExtraFeatures.join('、');
         const shoePrompt = selectedShoeName ? `，${selectedShoeName}` : "";
 
-        const template = `上傳的照片人物為原型${modeText}，幫我生成${d.count}張照片。
-人物特徵：${finalFeatures}
-衣服：極致輕薄的${d.dress}${shoePrompt}
+        const pureDressText = parseLineData(selectedDressLine).text;
+        const pureDistText = parseLineData(selectedDistLine).text;
+
+        const template = `上傳的照片人物為原型${modeText}，幫我生成${countVal}張照片。
+人物特徵：${finalFeat}
+衣服：極致輕薄的${pureDressText}${shoePrompt}
 動作：${currentRandomAction}
-角度：${d.dist}
+角度：${pureDistText}
 場景：${selectedSceneName}
 品質：超寫實 8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16`;
 
@@ -396,70 +407,40 @@
 
     function toggleMode(checked) {
         isDoubleMode = checked;
-        const statusText = document.getElementById('switch-status-text');
-        
-        if (isDoubleMode) {
-            statusText.innerText = '👥 當前模式：雙人';
-            statusText.style.color = 'var(--warning)';
-        } else {
-            statusText.innerText = '👤 當前模式：單人';
-            statusText.style.color = '#1e293b';
-        }
+        document.getElementById('switch-status-text').innerText = isDoubleMode ? '👥 當前：雙人生成模式' : '👤 當前：單人生成模式';
+        document.getElementById('switch-status-text').style.color = isDoubleMode ? 'var(--warning)' : 'var(--text-main)';
         rollActionForCurrentScene();
     }
 
     function resetConfig() {
-        if (confirm('確定要恢復官方預設文字嗎？這會覆蓋你手機上目前的修改。')) {
+        if(confirm('確定要還原成包含帶圖示範的預設文字？')) {
             items.forEach(item => localStorage.removeItem(`cfg-${item.id}`));
             init();
-            alert('已成功恢復預設值！');
         }
     }
-
     function exportConfig() {
-        const data = {};
-        items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
-        const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `prompt_backup_${new Date().toLocaleDateString()}.json`;
-        a.click();
+        const data = {}; items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
+        a.download = `prompt_v5.3_fast_slider.json`; a.click();
     }
-
     function importConfig() { document.getElementById('fileInput').click(); }
     function handleFile(input) {
-        const file = input.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
-            items.forEach(item => {
-                if (data[item.id]) {
-                    document.getElementById(`cfg-${item.id}`).value = data[item.id];
-                    localStorage.setItem(`cfg-${item.id}`, data[item.id]);
-                    if (item.id !== 'scene' && item.id !== 'shoes' && item.id !== 'twoperson' && item.id !== 'features') {
-                        updateDropdown(document.getElementById(`cfg-${item.id}`), document.getElementById(`sel-${item.id}`), item.id);
-                    }
-                }
-            });
-            renderFeaturesBadges();
-            renderSceneBadges();
-            renderShoesBadges();
-            rollActionForCurrentScene();
-            alert('導入成功！');
+            items.forEach(item => { if(data[item.id]) { document.getElementById(`cfg-${item.id}`).value = data[item.id]; localStorage.setItem(`cfg-${item.id}`, data[item.id]); } });
+            syncDataFromConfig(); rollActionForCurrentScene(); alert('導入成功！');
         };
-        reader.readAsText(file);
+        reader.readAsText(input.files[0]);
     }
-
-    function switchTab(index) {
-        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === index));
-        document.getElementById('section-gen').classList.toggle('active', index === 0);
-        document.getElementById('section-cfg').classList.toggle('active', index === 1);
+    function switchTab(idx) {
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+        document.getElementById('section-gen').classList.toggle('active', idx === 0);
+        document.getElementById('section-cfg').classList.toggle('active', idx === 1);
     }
-
     function copyPrompt() {
         navigator.clipboard.writeText(document.getElementById('final-output').innerText).then(() => {
-            const btn = document.querySelector('.btn-copy');
-            btn.innerText = '✅ 已複製';
+            const btn = document.querySelector('.btn-copy'); btn.innerText = '✅ 提示詞已複製！';
             setTimeout(() => btn.innerText = '一鍵複製提示詞', 1500);
         });
     }
