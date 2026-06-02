@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 5.5</title>
+    <title>AI Prompt Pro 5.8</title>
     <style>
         :root { --primary: #6366f1; --primary-light: #f0f2ff; --bg: #f8fafc; --warning: #f59e0b; --danger: #ef4444; --text-main: #0f172a; --text-sub: #64748b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -19,7 +19,6 @@
 
         .step-label { font-size: 13px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin: 18px 0 8px 2px; display: block; }
 
-        /* 雙開關 Banner 區 */
         .switch-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
         .switch-banner { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid #e2e8f0; }
         .switch-label { font-size: 15px; font-weight: 800; }
@@ -31,7 +30,6 @@
         #mode-checkbox:checked + .slider { background-color: var(--warning); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* 衣服 Slider */
         .slider-container { display: flex; overflow-x: auto; gap: 10px; padding: 4px 2px 10px 2px; margin-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .slider-container::-webkit-scrollbar { display: none; }
         .slider-container { -ms-overflow-style: none; scrollbar-width: none; }
@@ -44,9 +42,6 @@
         .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
         .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: white; color: var(--text-sub); transition: 0.2s; }
         .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        .picker-trigger { background: white; padding: 14px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 12px; }
-        .picker-trigger .val { font-size: 14px; font-weight: 700; color: var(--primary); }
 
         .machine-card { background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); padding: 14px; border-radius: 14px; border: 1px solid #d8b4fe; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
         .machine-text { font-size: 13px; font-weight: 700; color: #581c87; line-height: 1.5; background: rgba(255,255,255,0.7); padding: 10px 12px; border-radius: 10px; min-height: 48px; }
@@ -91,7 +86,7 @@
                 </label>
             </div>
             <div class="switch-banner">
-                <span class="switch-label" id="general-status-text">🌐 通用模式：關閉</span>
+                <span class="switch-label" id="general-status-text">🌐 通用模式（隨機萬能 Pose）：關閉</span>
                 <label class="switch">
                     <input type="checkbox" id="general-checkbox" onchange="toggleGeneralMode(this.checked)">
                     <span class="slider"></span>
@@ -117,11 +112,9 @@
             <button class="btn-spin" onclick="rollActionForCurrentScene()">🎲 重新抽動作提示詞</button>
         </div>
         
+        <!-- 📸 升級：完美換成單選藥丸容器 -->
         <span class="step-label">📸 鏡頭視角</span>
-        <div class="picker-trigger" onclick="openDrawerPicker()">
-            <span id="lbl-current-dist" class="val">讀取中...</span>
-            <span style="color: #94a3b8; font-size: 14px;">▾</span>
-        </div>
+        <div class="badge-grid" id="dist-badges-area"></div>
 
         <div class="inline-row">
             <label>🖼️ 相片產出數量</label>
@@ -129,6 +122,7 @@
         </div>
     </div>
 
+    <!-- 後台設定 -->
     <div id="section-cfg" class="section">
         <div class="ios-uploader-box">
             <p>📸 <b>iOS 本地相簿直傳生成器</b></p>
@@ -153,15 +147,14 @@
 </div>
 
 <script>
-    const BASE_FEATURES = "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
     let selectedExtraFeatures = [], selectedSceneName = '', selectedShoeName = '', selectedDressLine = '', selectedDistLine = '';
     let isDoubleMode = false, isGeneralMode = false, currentRandomAction = '';
 
-    // 內置融合你上傳嘅 16_05_2026 最新完整預設數據
     const items = [
+        { id: 'baseFeatures', label: '1. 人物基礎核心特徵 (固定出現在每條提示詞開頭)', default: '小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部' },
         { id: 'features', label: '7. 附加特徵池 (每行一個)', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n黑色金屬手扣\n全身沾有濃稠凡士林' },
         { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個)', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力神陷進其胯間衣料中，將其狠狠向後扣緊，兩人的雙腿在重力下完全交疊' },
-        { id: 'generalPool', label: '8. 🌐 通用模式動作池 (開啟通用模式時調用)', default: '不同姿勢' },
+        { id: 'generalPool', label: '8. 🌐 通用模式動作池 (開啟後每次「隨機抽 1 條」Artgravia 寫真風)', default: '韓系純欲風雜誌姿態，雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾，雙手略帶羞澀地交疊在雙腿間，眼神清澈且帶有一絲無辜與誘惑\nArtgravia經典微醺慵懶感，半靠在沙發扶手上，一隻手漫不經心地輕拉衣領，另一隻手放鬆垂下，雙腿微側交疊，展現流暢的S型腰臀曲線\n高級性感寫真定格，身體背對鏡頭呈45度扭轉，單手輕托下巴微微回眸，眼神帶著一絲冷艷與疏離，完美拉長頸部與肩背線條\n極致不對稱動態感，重心完全移向一側大腿，單手放鬆插在裙側，另一手輕撥弄耳邊碎髮，嘴唇微張，雙肩一高一低營造抓拍氛圍\n清純與嫵媚交織，坐在床沿，上身微微向後仰，雙手向後撐住床墊，修長的雙腿自然一前一後錯開，極致拉伸腹部與修長腿部線條\n空氣感寫真姿態，微微低頭，眼神避開正對鏡頭、漫不經心地看向斜下方，單手手指輕漸搭在肩膀衣帶上，呈現帶有故事感的鬆弛感\n居家慵懶雜誌風，整個人微蜷縮在單人沙發上，雙手抱膝，下巴輕輕抵在膝蓋上，眼神直視鏡頭，帶有一種讓人想保護的脆弱與性感\nArtgravia招牌肢體張力，微側身站立，雙手自然向後上方微伸作伸懶腰狀，上圍線條自然挺拔，腰部微凹，展現極致的女性身體弧度\n強烈故事感眼神殺，身體微微前傾，雙臂交疊支撐在桌面上，下巴微收，雙眸帶有強烈情感地「由下往上」深情凝視鏡頭\n膠片寫真抓拍動態，邁開輕盈步伐呈行走定格，單手輕拉裙擺，身體線條隨步伐自然延伸，頭髮微亂，充滿空氣感的瞬間捕捉\n法式慵懶性感，側臥在凌亂的白色床單上，單肘支撐頭部，另一隻手輕撫在胯骨處，腰部微沉，雙腿微曲，眼神迷離地看著鏡頭\n時尚雜誌封面姿態，雙腳微微張開站立，雙手自然垂下但指尖微張，頭部微微向一側歪斜，眼神冷酷，帶有高級厭世臉的純欲感\n不經意地靠在窗邊，單手手背輕抵著額頭，陽光灑在側臉上，身體微微扭轉迎向光源，展現極致精緻的五官與鎖骨線條\n性感跪姿定格，雙膝張開跪坐在腳踝上，雙手向上輕托著後腦勺的頭髮，手肘向兩側打開，極致展現腰部收緊與上半身挺拔的線條\n随性街拍風，身體微微靠向一側牆面，一隻腳底抵住牆壁，單手自然垂下，另一隻手勾住掛頸卡帶，神情放鬆且自信地直視鏡頭' },
         { id: 'dress', label: '2. 衣服款式 (格式: 圖片網址 | 提示詞)', default: '黑白侍女風穿搭，帶女僕頭飾、領結同小蕾絲圍裙元素\n淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡、珍珠元素\n白色低領短袖，黑色窄裙，深色尼龍連褲襪，領口綁藍白絲巾\n無袖高領白色針織上衣、灰色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n灰色開襟襯衫、黑色領結、黑色短裙、深色尼龍連襪褲\n短袖開襟白襯衫、黑色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n開襟白色長袖雪紡襯衫，灰色超短裙，藍色掛頸id卡；黑色皮革小手表\n貼身深灰西裝，白色低領內搭，深灰窄短裙，深色尼龍連褲襪\n貼身灰色西裝馬甲，白色襯衫配絲質領帶，灰色超短裙；黑色皮革小手表\n白色短袖襯衫長裙，領口帶細長藍色絲帶，綠色線條校徽\n貼身泳池穿搭，粉色系三件式綁帶風格，豐滿曲線誇張\n黑色兩件式內搭，蕾絲露腰風格，吊帶襪\n白色色兩件式內搭，蕾絲露腰風格，吊帶襪，小護士帽' },
         { id: 'shoes', label: '3. 鞋子款式', default: '光腳無鞋子\n黑色高跟鞋\n黑色高跟涼鞋\n白襪' },
         { id: 'dist', label: '4. 鏡頭角度與距離', default: '極致臉部大特寫，臉部占畫面50%以上\n中景\n近景\n俯視全身超廣角\n仰視全身超廣角' },
@@ -232,9 +225,7 @@
 
     function syncDataFromConfig() {
         renderClothesSlider();
-        const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
-        if(!selectedDistLine || !distLines.includes(selectedDistLine)) selectedDistLine = distLines[0] || '';
-        document.getElementById('lbl-current-dist').innerText = parseLineData(selectedDistLine).text;
+        renderDistBadges(); // 📸 核心 UI 渲染：鏡頭藥丸化
 
         const countSelect = document.getElementById('sel-count');
         const currCount = countSelect.value;
@@ -313,6 +304,28 @@
         });
     }
 
+    // 📸 完美轉換：鏡頭視角單選藥丸生成器 (強制單選，不允許為空)
+    function renderDistBadges() {
+        const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
+        const area = document.getElementById('dist-badges-area');
+        area.innerHTML = '';
+        if(!selectedDistLine || !distLines.includes(selectedDistLine)) selectedDistLine = distLines[0] || '';
+
+        distLines.forEach(line => {
+            const data = parseLineData(line);
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (line === selectedDistLine ? ' active' : '');
+            b.innerText = data.text;
+            b.onclick = () => {
+                document.querySelectorAll('#dist-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
+                b.classList.add('active');
+                selectedDistLine = line;
+                updateResult();
+            };
+            area.appendChild(b);
+        });
+    }
+
     function renderSceneBadges() {
         const parsed = parseScenes();
         const area = document.getElementById('scene-badges-area');
@@ -343,14 +356,15 @@
         return list;
     }
 
-    // 🌐 核心邏輯修改：根據通用模式開關切換數據源
     function rollActionForCurrentScene() {
         let pool = [];
         const title = document.getElementById('badge-title');
+        let maxRoll = 10; 
         
         if (isGeneralMode) {
             pool = document.getElementById('cfg-generalPool').value.split('\n').filter(l=>l.trim());
-            title.innerText = "🌐 通用模式生效中 (不調用場景動作)";
+            title.innerText = "🌐 通用模式：正在隨機秒抽 1 條進階 Pose";
+            maxRoll = 1; 
         } else if (isDoubleMode) {
             pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
             title.innerText = "👥 抽籤中：雙人專屬動作池";
@@ -361,15 +375,16 @@
         }
 
         if(pool.length > 0) {
-            let res = []; const maxRoll = Math.min(10, pool.length);
+            let res = []; 
+            const finalMax = Math.min(maxRoll, pool.length);
             let poolCopy = [...pool];
-            for(let i=0; i<maxRoll; i++) { 
+            for(let i=0; i<finalMax; i++) { 
                 if(poolCopy.length === 0) break;
                 res.push(poolCopy.splice(Math.floor(Math.random()*poolCopy.length), 1)[0]); 
             }
             currentRandomAction = res.join('、');
         } else {
-            currentRandomAction = '不同姿勢';
+            currentRandomAction = '自然放鬆的姿態';
         }
         document.getElementById('current-action-display').innerText = currentRandomAction;
         updateResult();
@@ -378,7 +393,10 @@
     function updateResult() {
         const countVal = document.getElementById('sel-count').value || '10';
         const modeText = isDoubleMode ? "（雙人互動模式）" : "";
-        let finalFeat = BASE_FEATURES;
+        
+        const baseFeatInput = document.getElementById('cfg-baseFeatures');
+        let finalFeat = baseFeatInput ? baseFeatInput.value.trim() : "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
+        
         if(selectedExtraFeatures.length > 0) finalFeat += "，" + selectedExtraFeatures.join('、');
         const shoePrompt = selectedShoeName ? `，${selectedShoeName}` : "";
 
@@ -403,7 +421,6 @@
         rollActionForCurrentScene();
     }
 
-    // 🌐 切換通用模式開關
     function toggleGeneralMode(checked) {
         isGeneralMode = checked;
         document.getElementById('general-status-text').innerText = isGeneralMode ? '🌐 通用模式：開啟' : '🌐 通用模式：關閉';
@@ -420,7 +437,7 @@
     function exportConfig() {
         const data = {}; items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
-        a.download = `prompt_v5.5_general_mode.json`; a.click();
+        a.download = `prompt_v5.8_badge_dist.json`; a.click();
     }
     function importConfig() { document.getElementById('fileInput').click(); }
     function handleFile(input) {
@@ -443,16 +460,6 @@
             const btn = document.querySelector('.btn-copy'); btn.innerText = '✅ 提示詞已複製！';
             setTimeout(() => btn.innerText = '一鍵複製提示詞', 1500);
         });
-    }
-
-    function openDrawerPicker() {
-        const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
-        let msg = "請選擇鏡頭角度數字：\n" + distLines.map((l,i)=> `${i+1}. ${parseLineData(l).text}`).join('\n');
-        let res = prompt(msg, "1");
-        if(res && parseInt(res) <= distLines.length) {
-            selectedDistLine = distLines[parseInt(res)-1];
-            syncDataFromConfig();
-        }
     }
 
     init();
