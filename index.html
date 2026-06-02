@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 6.1</title>
+    <title>AI Prompt Pro 6.2</title>
     <style>
         :root { --primary: #6366f1; --primary-light: #f0f2ff; --bg: #f8fafc; --warning: #f59e0b; --danger: #ef4444; --text-main: #0f172a; --text-sub: #64748b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -149,14 +149,16 @@
 
     const items = [
         { id: 'baseFeatures', label: '1. 人物基礎核心特徵', default: '小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部' },
-        { id: 'features', label: '7. 附加特徵池', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n黑色金屬手扣\n全身沾有濃稠凡士林' },
-        { id: 'twoperson', label: '6. 雙人模式獨立動作池', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力神陷進其胯間衣料中，將其狠狠向後扣緊，兩人的雙腿在重力下完全交疊' },
-        { id: 'generalPool', label: '8. 🌐 通用模式動作池', default: '韓系純欲風雜誌姿態，雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾，雙手略帶羞澀地交疊在雙腿間，眼神清澈且帶有一絲無辜與誘惑\nArtgravia經典微醺慵懶感，半靠在沙發扶手上，一隻手漫不經心地輕拉衣領，另一隻手放鬆垂下，雙腿微側交疊，展現流暢的S型腰臀曲線\n高級性感寫真定格，身體背對鏡頭呈45度扭轉，單手輕托下巴微微回眸，眼神帶著一絲冷艷與疏離，完美拉長頸部與肩背線條\n極致不對稱動態感，重心完全移向一側大腿，單手放鬆插在裙側，另一手輕撥弄耳邊碎髮，嘴唇微張，雙肩一高一低營造抓拍氛圍\n清純與嫵媚交織，坐在床沿，上身微微向後仰，雙手向後撐住床墊，修長的雙腿自然一前一後錯開，極致拉伸腹部與修長腿部線條\n空氣感寫真姿態，微微低頭，眼神避開正對鏡頭、漫不經心地看向斜下方，單手手指輕輕搭在肩膀衣帶上，呈現帶有故事感的鬆弛感\n居家慵懶雜誌風，整個人微蜷縮在單人沙發上，雙手抱膝，下巴輕輕抵在膝蓋上，眼神直視鏡頭，帶有一種讓人想保護的脆弱與性感\nArtgravia招牌肢體張力，微側身站立，雙手自然向後上方微伸作伸懶腰狀，上圍線條自然挺拔，腰部微凹，展現極致的女性身體弧度\n強烈故事感眼神殺，身體微微前傾，雙臂交疊支撐在桌面上，下巴微收，雙眸帶有強烈情感地「由下往上」深情凝視鏡頭\n膠片寫真抓拍動態，邁開輕盈步伐呈行走定格，單手輕拉裙擺，身體線條隨步伐自然延伸，頭髮微亂，充滿空氣感的瞬間捕捉\n法式慵懶性感，側臥在凌亂的白色床單上，單肘支撐頭部，另一隻手輕撫在胯骨處，腰部微沉，雙腿微曲，眼神迷離地看著鏡頭\n時尚雜誌封面姿態，雙腳微微張開站立，雙手自然垂下但指尖微張，頭部微微向一側歪斜，眼神冷酷，帶有高級厭世臉的純欲感\n不經意地靠在窗邊，單手手背輕抵著額頭，陽光灑在側臉上，身體微微扭轉迎向光源，展現極致精緻的五官與鎖骨線條\n性感跪姿定格，雙膝張開跪坐在腳踝上，雙手向上輕托著後腦勺的頭髮，手肘向向兩側打開，極致展現腰部收緊與上半身挺拔的線條\n隨性街拍風，身體微微靠向一側牆面，一隻腳底抵住牆壁，單手自然垂下，另一隻手勾住掛頸卡帶，神情放鬆且自信地直視鏡頭' },
-        { id: 'generalCount', label: '9. 🌐 通用模式每次抽取動作數量', default: '3' },
         { id: 'dress', label: '2. 衣服款式', default: '黑白侍女風穿搭，帶女僕頭飾、領結同小蕾絲圍裙元素\n淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡、珍珠元素\n白色低領短袖，黑色窄裙，深色尼龍連褲襪，領口綁藍白絲巾\n無袖高領白色針織上衣、灰色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n灰色開襟襯衫、黑色領結、黑色短裙、深色尼龍連襪褲\n短袖開襟白襯衫、黑色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n開襟白色長袖雪紡襯衫，灰色超短裙，藍色掛頸id卡；黑色皮革小手表\n貼身深灰西裝，白色低領內搭，深灰窄短裙，深色尼龍連褲襪\n貼身灰色西裝馬甲，白色襯衫配絲質領帶，灰色超短裙；黑色皮革小手表\n白色短袖襯衫長裙，領口帶細長藍色絲帶，綠色線條校徽\n貼身泳池穿搭，粉色系三件式綁帶風格，豐滿曲線誇張\n黑色兩件式內搭，蕾絲露腰風格，吊帶襪\n白色色兩件式內搭，蕾絲露腰風格, 吊帶襪, 小護士帽' },
         { id: 'shoes', label: '3. 鞋子款式', default: '光腳無鞋子\n黑色高跟鞋\n黑色高跟涼鞋\n白襪' },
         { id: 'dist', label: '4. 鏡頭角度與距離', default: '極致臉部大特寫，臉部占畫面50%以上\n中景\n近景\n俯視全身超廣角\n仰視全身超廣角' },
         { id: 'scene', label: '5. 場景與背景', default: `# 攝影棚白色背景\n# 辦公室\n獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭\n手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態\n站在落地窗前微側身，眺望遠方\n雙臂交叉胸前，背靠辦公椅\n單手拿著原子筆，微微轉頭對著鏡頭\n手持觸控筆停在螢幕前，眼神專注地側臉面對鏡頭\n抱著筆電漫步走廊，步伐輕盈且自信地看向前方\n身體微微前傾，雙手交疊在合約上展現幹練氣質\n手拿雷射筆指向白板，身體微側展現完美身材線條\n單手扶著書架邊緣，微微仰頭尋找書籍展現俐落側影\n# 酒店房間\n# 教室\n# 室內運動場\n# 戶外游泳池\n# 高級美容院` },
+        { id: 'sceneCount', label: '5b. 場景模式每次抽取動作數量', default: '3' },
+        { id: 'twoperson', label: '6. 雙人模式獨立動作池', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力神陷進其胯間衣料中，將其狠狠向後扣緊，兩人的雙腿在重力下完全交疊' },
+        { id: 'twopersonCount', label: '6b. 雙人模式每次抽取動作數量', default: '1' },
+        { id: 'features', label: '7. 附加特徵池', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n黑色金屬手扣\n全身沾有濃稠凡士林' },
+        { id: 'generalPool', label: '8. 🌐 通用模式動作池', default: '韓系純欲風雜誌姿態，雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾，雙手略帶羞澀地交疊在雙腿間，眼神清澈且帶有一絲無辜與誘惑\nArtgravia經典微醺慵懶感，半靠在沙發扶手上，一隻手漫不經心地輕拉衣領，另一隻手放鬆垂下，雙腿微側交疊，展現流暢的S型腰臀曲線\n高級性感寫真定格，身體背對鏡頭呈45度扭轉，單手輕托下巴微微回眸，眼神帶著一絲冷艷與疏離，完美拉長頸部與肩背線條\n極致不對稱動態感，重心完全移向一側大腿，單手放鬆插在裙側，另一手輕撥弄耳邊碎髮，嘴唇微張，雙肩一高一低營造抓拍氛圍\n清純與嫵媚交織，坐在床沿，上身微微向後仰，雙手向後撐住床墊，修長的雙腿自然一前一後錯開，極致拉伸腹部與修長腿部線條\n空氣感寫真姿態，微微低頭，眼神避開正對鏡頭、漫不經心地看向斜下方，單手手指輕輕搭在肩膀衣帶上，呈現帶有故事感的鬆弛感\n居家慵懶雜誌風，整個人微蜷縮在單人沙發上，雙手抱膝，下巴輕輕抵在膝蓋上，眼神直視鏡頭，帶有一種讓人想保護的脆弱與性感\nArtgravia招牌肢體張力，微側身站立，雙手自然向後上方微伸作伸懶腰狀，上圍線條自然挺拔，腰部微凹，展現極致的女性身體弧度\n強烈故事感眼神殺，身體微微前傾，雙臂交疊支撐在桌面上，下巴微收，雙眸帶有強烈情感地「由下往上」深情凝視鏡頭\n膠片寫真抓拍動態，邁開輕盈步伐呈行走定格，單手輕拉裙擺，身體線條隨步伐自然延伸，頭髮微亂，充滿空氣感的瞬間捕捉\n法式慵懶性感，側臥在凌亂的白色床單上，單肘支撐頭部，另一隻手輕撫在胯骨處，腰部微沉，雙腿微曲，眼神迷離地看著鏡頭\n時尚雜誌封面姿態，雙腳微微張開站立，雙手自然垂下但指尖微張，頭部微微向一側歪斜，眼神冷酷，帶有高級厭世臉的純欲感\n不經意地靠在窗邊，單手手背輕抵著額頭，陽光灑在側臉上，身體微微扭轉迎向光源，展現極致精緻的五官與鎖骨線條\n性感跪姿定格，雙膝張開跪坐在腳踝上，雙手向上輕托著後腦勺的頭髮，手肘向向兩側打開，極致展現腰部收緊與上半身挺拔的線條\n隨性街拍風，身體微微靠向一側牆面，一隻腳底抵住牆壁，單手自然垂下，另一隻手勾住掛頸卡帶，神情放鬆且自信地直視鏡頭' },
+        { id: 'generalCount', label: '9. 🌐 通用模式每次抽取動作數量', default: '3' },
         { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
     ];
 
@@ -355,7 +357,7 @@
     function rollActionForCurrentScene() {
         let pool = [];
         const title = document.getElementById('badge-title');
-        let maxRoll = 1; // 預設標準模式只抽1條
+        let maxRoll = 3; 
         
         if (isGeneralMode) {
             pool = document.getElementById('cfg-generalPool').value.split('\n').filter(l=>l.trim());
@@ -365,11 +367,18 @@
             title.innerText = `🌐 通用模式：隨機抽取 ${maxRoll} 條 Pose`;
         } else if (isDoubleMode) {
             pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
-            title.innerText = "👥 雙人模式動作池";
+            const dCountEl = document.getElementById('cfg-twopersonCount');
+            maxRoll = dCountEl ? (parseInt(dCountEl.value) || 1) : 1;
+            if (maxRoll < 1) maxRoll = 1;
+            title.innerText = `👥 雙人模式：隨機抽取 ${maxRoll} 條 Pose`;
         } else {
+            // 🌟 升級場景模式：全面對齊通用模式抽取邏輯
             const match = parseScenes().find(p=>p.name === selectedSceneName);
             if(match) pool = [...match.actions];
-            title.innerText = `👤 ${selectedSceneName} 動作`;
+            const sCountEl = document.getElementById('cfg-sceneCount');
+            maxRoll = sCountEl ? (parseInt(sCountEl.value) || 3) : 3;
+            if (maxRoll < 1) maxRoll = 1;
+            title.innerText = `👤 ${selectedSceneName} 模式：隨機抽取 ${maxRoll} 條 Pose`;
         }
 
         if(pool.length > 0) {
@@ -380,7 +389,6 @@
                 if(poolCopy.length === 0) break;
                 res.push(poolCopy.splice(Math.floor(Math.random()*poolCopy.length), 1)[0]); 
             }
-            // 🌟 核心更改：多條 Pose 抽取後使用全形分號「；」進行明顯分隔
             currentRandomAction = res.join('；'); 
         } else {
             currentRandomAction = '自然放鬆的姿態';
@@ -436,7 +444,7 @@
     function exportConfig() {
         const data = {}; items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
-        a.download = `prompt_v6.1_semicolon.json`; a.click();
+        a.download = `prompt_v6.2_multi.json`; a.click();
     }
     function importConfig() { document.getElementById('fileInput').click(); }
     function handleFile(input) {
