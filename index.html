@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 5.3</title>
+    <title>AI Prompt Pro 5.5</title>
     <style>
         :root { --primary: #6366f1; --primary-light: #f0f2ff; --bg: #f8fafc; --warning: #f59e0b; --danger: #ef4444; --text-main: #0f172a; --text-sub: #64748b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); margin: 0; padding-bottom: 180px; color: var(--text-main); }
         
-        /* Tab 導航 */
         .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .tab { flex: 1; text-align: center; padding: 16px; font-weight: 700; color: #94a3b8; border-bottom: 3px solid transparent; transition: 0.2s; font-size: 14px; }
         .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
@@ -20,24 +19,20 @@
 
         .step-label { font-size: 13px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin: 18px 0 8px 2px; display: block; }
 
-        /* 模式切換 */
-        .switch-banner { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+        /* 雙開關 Banner 區 */
+        .switch-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .switch-banner { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid #e2e8f0; }
         .switch-label { font-size: 15px; font-weight: 800; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--warning); }
+        input:checked + .slider { background-color: var(--primary); }
+        #mode-checkbox:checked + .slider { background-color: var(--warning); }
         input:checked + .slider:before { transform: translateX(22px); }
 
-        /* 膠囊 Badge */
-        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: white; color: var(--text-sub); transition: 0.2s; }
-        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* 🏃‍♂️ 核心亮點：衣服專用主頁面橫向極速 Slider */
+        /* 衣服 Slider */
         .slider-container { display: flex; overflow-x: auto; gap: 10px; padding: 4px 2px 10px 2px; margin-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-        /* 隱藏原生冷酷嘅 Scrollbar，令畫面有原生 App 質感 */
         .slider-container::-webkit-scrollbar { display: none; }
         .slider-container { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -46,11 +41,13 @@
         .slider-card.active { border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); transform: translateY(-2px); }
         .slider-card.active::after { content: "✓"; position: absolute; top: 6px; right: 6px; background: var(--primary); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
 
-        /* 普通觸發鈕 (留番畀項目較少嘅鏡頭視角) */
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: white; color: var(--text-sub); transition: 0.2s; }
+        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
+
         .picker-trigger { background: white; padding: 14px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 12px; }
         .picker-trigger .val { font-size: 14px; font-weight: 700; color: var(--primary); }
 
-        /* 隨機動作激發器 */
         .machine-card { background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); padding: 14px; border-radius: 14px; border: 1px solid #d8b4fe; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
         .machine-text { font-size: 13px; font-weight: 700; color: #581c87; line-height: 1.5; background: rgba(255,255,255,0.7); padding: 10px 12px; border-radius: 10px; min-height: 48px; }
         .btn-spin { background: #7c3aed; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
@@ -59,18 +56,10 @@
         .inline-row label { font-size: 14px; font-weight: 700; }
         .inline-row select { padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: bold; background: #f8fafc; }
 
-        /* 📱 底部 Drawer (得返鏡頭視角會用) */
-        .drawer-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(15, 23, 42, 0.6); z-index: 2000; display: none; opacity: 0; transition: opacity 0.25s ease; backdrop-filter: blur(2px); }
-        .bottom-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: white; z-index: 2001; transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px 20px 0 0; max-height: 50vh; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; }
-        .bottom-drawer.open { transform: translateY(0); }
-        .drawer-header { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; background: #fafafa; border-radius: 20px 20px 0 0; }
-        .drawer-title { font-size: 15px; font-weight: 800; }
-        .drawer-close { background: #e2e8f0; border: none; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .drawer-content { overflow-y: auto; padding: 10px 16px 30px 16px; }
-        .drawer-item { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; border-radius: 10px; margin-top: 4px; font-size: 14px; }
-        .drawer-item.active { background: var(--primary-light); color: var(--primary); font-weight: 700; }
+        .ios-uploader-box { background: #f0f2ff; border: 2px dashed #6366f1; border-radius: 12px; padding: 12px; margin-bottom: 15px; text-align: center; }
+        .ios-uploader-box p { margin: 0 0 8px 0; font-size: 12px; font-weight: bold; color: #4338ca; }
+        .btn-upload-ui { background: white; border: 1px solid #6366f1; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; color: #6366f1; display: inline-block; cursor: pointer; }
 
-        /* 後台配置 */
         .config-card { background: white; padding: 16px; border-radius: 14px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
         .config-card label { display: block; font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
         textarea { width: 100%; height: 110px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-size: 13px; background: #f8fafc; resize: none; line-height: 1.4; }
@@ -93,12 +82,21 @@
 <div class="container">
     <div id="section-gen" class="section active">
         
-        <div class="switch-banner">
-            <span class="switch-label" id="switch-status-text">👤 當前：單人生成模式</span>
-            <label class="switch">
-                <input type="checkbox" id="mode-checkbox" onchange="toggleMode(this.checked)">
-                <span class="slider"></span>
-            </label>
+        <div class="switch-group">
+            <div class="switch-banner">
+                <span class="switch-label" id="switch-status-text">👤 當前：單人生成模式</span>
+                <label class="switch">
+                    <input type="checkbox" id="mode-checkbox" onchange="toggleMode(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="switch-banner">
+                <span class="switch-label" id="general-status-text">🌐 通用模式：關閉</span>
+                <label class="switch">
+                    <input type="checkbox" id="general-checkbox" onchange="toggleGeneralMode(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
 
         <span class="step-label">🧬 附加特徵多選</span>
@@ -120,7 +118,7 @@
         </div>
         
         <span class="step-label">📸 鏡頭視角</span>
-        <div class="picker-trigger" onclick="openDrawerPicker('dist')">
+        <div class="picker-trigger" onclick="openDrawerPicker()">
             <span id="lbl-current-dist" class="val">讀取中...</span>
             <span style="color: #94a3b8; font-size: 14px;">▾</span>
         </div>
@@ -132,6 +130,13 @@
     </div>
 
     <div id="section-cfg" class="section">
+        <div class="ios-uploader-box">
+            <p>📸 <b>iOS 本地相簿直傳生成器</b></p>
+            <label class="btn-upload-ui" for="ios-photo-picker">選擇手機照片轉化文字</label>
+            <input type="file" id="ios-photo-picker" accept="image/*" style="display:none" onchange="convertImageToBase64(this)">
+            <div style="font-size:10px; color:var(--text-sub); margin-top:6px;">揀完相片後，會自動喺「衣服款式」最底追加一行 Base64 代碼！</div>
+        </div>
+
         <div id="config-fields"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <button class="btn-action btn-secondary" onclick="exportConfig()">📤 匯出備份</button>
@@ -142,15 +147,6 @@
     </div>
 </div>
 
-<div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawerPicker()"></div>
-<div id="bottom-drawer" class="bottom-drawer">
-    <div class="drawer-header">
-        <span id="drawer-title" class="drawer-title">請選擇一項</span>
-        <button class="drawer-close" onclick="closeDrawerPicker()">✕</button>
-    </div>
-    <div id="drawer-content" class="drawer-content"></div>
-</div>
-
 <div class="footer-preview">
     <div class="output-text" id="final-output"></div>
     <button class="btn-copy" onclick="copyPrompt()">一鍵複製提示詞</button>
@@ -159,23 +155,17 @@
 <script>
     const BASE_FEATURES = "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
     let selectedExtraFeatures = [], selectedSceneName = '', selectedShoeName = '', selectedDressLine = '', selectedDistLine = '';
-    let isDoubleMode = false, currentRandomAction = '';
+    let isDoubleMode = false, isGeneralMode = false, currentRandomAction = '';
 
+    // 內置融合你上傳嘅 16_05_2026 最新完整預設數據
     const items = [
         { id: 'features', label: '7. 附加特徵池 (每行一個)', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n黑色金屬手扣\n全身沾有濃稠凡士林' },
         { id: 'twoperson', label: '6. 雙人模式獨立動作池 (每行一個)', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力神陷進其胯間衣料中，將其狠狠向後扣緊，兩人的雙腿在重力下完全交疊' },
-        { id: 'dress', label: '2. 衣服款式 (格式: 圖片網址 | 提示詞)', default: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300 | 黑白侍女風穿搭，帶女僕頭飾、領結同小蕾絲圍裙元素\nhttps://images.unsplash.com/photo-1621184455862-c163dfb30e0f?w=300 | 淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡、珍珠元素\nhttps://images.unsplash.com/photo-1612336307429-8a898d10e223?w=300 | 白色低領短袖，黑色窄裙，深色尼龍連褲襪，領口綁藍白絲巾\nhttps://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300 | 無袖高領白色針織上衣、灰色緊身短裙、深色尼龍連褲襪\n灰色開襟襯衫、黑色領結、黑色短裙\n短袖開襟白襯衫、黑色緊身短裙\n開襟白色長袖雪紡襯衫，灰色超短裙\n貼身深灰西裝配深色尼龍連褲襪\n貼身西裝馬甲配灰色超短裙\n白色短袖襯衫長裙，細長藍色絲帶\n貼身泳池穿搭，粉色系三件式綁帶風格\n黑色兩件式內搭，蕾絲露腰風格，吊帶襪\n白色兩件式內搭，蕾絲露腰風格，小護士帽' },
+        { id: 'generalPool', label: '8. 🌐 通用模式動作池 (開啟通用模式時調用)', default: '不同姿勢' },
+        { id: 'dress', label: '2. 衣服款式 (格式: 圖片網址 | 提示詞)', default: '黑白侍女風穿搭，帶女僕頭飾、領結同小蕾絲圍裙元素\n淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡、珍珠元素\n白色低領短袖，黑色窄裙，深色尼龍連褲襪，領口綁藍白絲巾\n無袖高領白色針織上衣、灰色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n灰色開襟襯衫、黑色領結、黑色短裙、深色尼龍連襪褲\n短袖開襟白襯衫、黑色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n開襟白色長袖雪紡襯衫，灰色超短裙，藍色掛頸id卡；黑色皮革小手表\n貼身深灰西裝，白色低領內搭，深灰窄短裙，深色尼龍連褲襪\n貼身灰色西裝馬甲，白色襯衫配絲質領帶，灰色超短裙；黑色皮革小手表\n白色短袖襯衫長裙，領口帶細長藍色絲帶，綠色線條校徽\n貼身泳池穿搭，粉色系三件式綁帶風格，豐滿曲線誇張\n黑色兩件式內搭，蕾絲露腰風格，吊帶襪\n白色色兩件式內搭，蕾絲露腰風格，吊帶襪，小護士帽' },
         { id: 'shoes', label: '3. 鞋子款式', default: '光腳無鞋子\n黑色高跟鞋\n黑色高跟涼鞋\n白襪' },
         { id: 'dist', label: '4. 鏡頭角度與距離', default: '極致臉部大特寫，臉部占畫面50%以上\n中景\n近景\n俯視全身超廣角\n仰視全身超廣角' },
-        { id: 'scene', label: '5. 場景與背景', default: `# 攝影棚白色背景
-# 辦公室
-獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭
-手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態
-站在落地窗前微側身，眺望遠方
-# 酒店房間
-# 教室
-# 室內運動場
-# 戶外游泳池` },
+        { id: 'scene', label: '5. 場景與背景', default: `# 攝影棚白色背景\n# 辦公室\n獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭\n手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態\n站在落地窗前微側身，眺望遠方\n雙臂交叉胸前，背靠辦公椅\n單手拿著原子筆，微微轉頭對著鏡頭\n手持觸控筆停在螢幕前，眼神專注地側臉面對鏡頭\n抱著筆電漫步走廊，步伐輕盈且自信地看向前方\n身體微微前傾，雙手交疊在合約上展現幹練氣質\n手拿雷射筆指向白板，身體微側展現完美身材線條\n單手扶著書架邊緣，微微仰頭尋找書籍展現俐落側影\n# 酒店房間\n# 教室\n# 室內運動場\n# 戶外游泳池\n# 高級美容院` },
         { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
     ];
 
@@ -199,6 +189,38 @@
         rollActionForCurrentScene();
     }
 
+    function convertImageToBase64(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const maxW = 300; 
+                const scale = maxW / img.width;
+                canvas.width = maxW;
+                canvas.height = img.height * scale;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                const promptDesc = prompt("請輸入呢件衫嘅 AI 提示詞描述：", "客製化本地服飾");
+                if (promptDesc === null) return;
+
+                const txtArea = document.getElementById('cfg-dress');
+                const currentVal = txtArea.value.trim();
+                txtArea.value = currentVal + (currentVal ? '\n' : '') + `${compressedBase64} | ${promptDesc}`;
+                localStorage.setItem('cfg-dress', txtArea.value);
+                syncDataFromConfig();
+                alert('📸 本地衣服大卡片已生成！');
+            };
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
+    }
+
     function parseLineData(line) {
         if (!line) return { img: '', text: '' };
         if (line.includes('|')) {
@@ -209,10 +231,7 @@
     }
 
     function syncDataFromConfig() {
-        // ⚡ 核心渲染：刷新主頁衣服 Slider 傳送帶
         renderClothesSlider();
-
-        // 同步鏡頭視角
         const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
         if(!selectedDistLine || !distLines.includes(selectedDistLine)) selectedDistLine = distLines[0] || '';
         document.getElementById('lbl-current-dist').innerText = parseLineData(selectedDistLine).text;
@@ -229,12 +248,10 @@
         updateResult();
     }
 
-    /* ⚡ 橫向 Slider 生態引擎：直接喺主頁塞爆視覺卡片 */
     function renderClothesSlider() {
         const container = document.getElementById('dress-slider-container');
         container.innerHTML = '';
         const lines = document.getElementById('cfg-dress').value.split('\n').filter(l=>l.trim());
-        
         if(!selectedDressLine || !lines.includes(selectedDressLine)) selectedDressLine = lines[0] || '';
 
         lines.forEach(line => {
@@ -243,12 +260,10 @@
             card.className = 'slider-card' + (line === selectedDressLine ? ' active' : '');
             
             if(data.img) {
-                // 有圖顯示大卡片，不污染文字空間
                 const img = document.createElement('img');
                 img.src = data.img;
                 card.appendChild(img);
             } else {
-                // 無圖時文字卡片無縫補位
                 card.innerText = data.text;
             }
             
@@ -260,40 +275,6 @@
             };
             container.appendChild(card);
         });
-    }
-
-    /* 📱 輕量級 Bottom Sheet (只留畀少選項嘅鏡頭角) */
-    function openDrawerPicker(type) {
-        const overlay = document.getElementById('drawer-overlay');
-        const drawer = document.getElementById('bottom-drawer');
-        const title = document.getElementById('drawer-title');
-        const content = document.getElementById('drawer-content');
-        content.innerHTML = '';
-        
-        title.innerText = '📸 選擇鏡頭角度';
-        const lines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
-        lines.forEach(line => {
-            const data = parseLineData(line);
-            const div = document.createElement('div');
-            div.className = 'drawer-item' + (line === selectedDistLine ? ' active' : '');
-            div.innerHTML = data.text;
-            div.onclick = () => {
-                selectedDistLine = line;
-                closeDrawerPicker();
-                syncDataFromConfig();
-            };
-            content.appendChild(div);
-        });
-
-        overlay.style.display = 'block';
-        setTimeout(() => { overlay.style.opacity = '1'; drawer.classList.add('open'); }, 10);
-    }
-
-    function closeDrawerPicker() {
-        const overlay = document.getElementById('drawer-overlay');
-        const drawer = document.getElementById('bottom-drawer');
-        overlay.style.opacity = '0'; drawer.classList.remove('open');
-        setTimeout(() => { overlay.style.display = 'none'; }, 250);
     }
 
     function renderFeaturesBadges() {
@@ -362,10 +343,15 @@
         return list;
     }
 
+    // 🌐 核心邏輯修改：根據通用模式開關切換數據源
     function rollActionForCurrentScene() {
         let pool = [];
         const title = document.getElementById('badge-title');
-        if(isDoubleMode) {
+        
+        if (isGeneralMode) {
+            pool = document.getElementById('cfg-generalPool').value.split('\n').filter(l=>l.trim());
+            title.innerText = "🌐 通用模式生效中 (不調用場景動作)";
+        } else if (isDoubleMode) {
             pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
             title.innerText = "👥 抽籤中：雙人專屬動作池";
         } else {
@@ -373,12 +359,17 @@
             if(match) pool = [...match.actions];
             title.innerText = `👤 抽籤中：${selectedSceneName} 動作`;
         }
+
         if(pool.length > 0) {
             let res = []; const maxRoll = Math.min(10, pool.length);
-            for(let i=0; i<maxRoll; i++) { res.push(pool.splice(Math.floor(Math.random()*pool.length), 1)[0]); }
+            let poolCopy = [...pool];
+            for(let i=0; i<maxRoll; i++) { 
+                if(poolCopy.length === 0) break;
+                res.push(poolCopy.splice(Math.floor(Math.random()*poolCopy.length), 1)[0]); 
+            }
             currentRandomAction = res.join('、');
         } else {
-            currentRandomAction = isDoubleMode ? '雙人親密合照，自然互動' : '自然放鬆的姿勢';
+            currentRandomAction = '不同姿勢';
         }
         document.getElementById('current-action-display').innerText = currentRandomAction;
         updateResult();
@@ -412,8 +403,16 @@
         rollActionForCurrentScene();
     }
 
+    // 🌐 切換通用模式開關
+    function toggleGeneralMode(checked) {
+        isGeneralMode = checked;
+        document.getElementById('general-status-text').innerText = isGeneralMode ? '🌐 通用模式：開啟' : '🌐 通用模式：關閉';
+        document.getElementById('general-status-text').style.color = isGeneralMode ? 'var(--primary)' : 'var(--text-main)';
+        rollActionForCurrentScene();
+    }
+
     function resetConfig() {
-        if(confirm('確定要還原成包含帶圖示範的預設文字？')) {
+        if(confirm('確定要還原預設文字？')) {
             items.forEach(item => localStorage.removeItem(`cfg-${item.id}`));
             init();
         }
@@ -421,7 +420,7 @@
     function exportConfig() {
         const data = {}; items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
-        a.download = `prompt_v5.3_fast_slider.json`; a.click();
+        a.download = `prompt_v5.5_general_mode.json`; a.click();
     }
     function importConfig() { document.getElementById('fileInput').click(); }
     function handleFile(input) {
@@ -437,12 +436,23 @@
         document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
         document.getElementById('section-gen').classList.toggle('active', idx === 0);
         document.getElementById('section-cfg').classList.toggle('active', idx === 1);
+        if(idx === 0) syncDataFromConfig();
     }
     function copyPrompt() {
         navigator.clipboard.writeText(document.getElementById('final-output').innerText).then(() => {
             const btn = document.querySelector('.btn-copy'); btn.innerText = '✅ 提示詞已複製！';
             setTimeout(() => btn.innerText = '一鍵複製提示詞', 1500);
         });
+    }
+
+    function openDrawerPicker() {
+        const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
+        let msg = "請選擇鏡頭角度數字：\n" + distLines.map((l,i)=> `${i+1}. ${parseLineData(l).text}`).join('\n');
+        let res = prompt(msg, "1");
+        if(res && parseInt(res) <= distLines.length) {
+            selectedDistLine = distLines[parseInt(res)-1];
+            syncDataFromConfig();
+        }
     }
 
     init();
