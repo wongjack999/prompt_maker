@@ -3,238 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 6.2</title>
+    <title>AI Prompt Pro 9.3</title>
     <style>
-        :root { --primary: #6366f1; --primary-light: #f0f2ff; --bg: #f8fafc; --warning: #f59e0b; --danger: #ef4444; --text-main: #0f172a; --text-sub: #64748b; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); margin: 0; padding-bottom: 180px; color: var(--text-main); }
+        :root { 
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-main: #0f172a; 
+            --text-sub: #64748b; 
+            --primary: #4f46e5; 
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --accent: #7c3aed; 
+            --border: #e2e8f0;
+            --radius-main: 16px;
+        }
         
-        .tabs { display: flex; background: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .tab { flex: 1; text-align: center; padding: 16px; font-weight: 700; color: #94a3b8; border-bottom: 3px solid transparent; transition: 0.2s; font-size: 14px; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding-bottom: 250px; color: var(--text-main); }
+        
+        .tabs { display: flex; background: var(--card-bg); padding: 6px; margin: 16px; border-radius: var(--radius-main); box-shadow: 0 4px 20px rgba(15,23,42,0.04); position: sticky; top: 12px; z-index: 100; border: 1px solid var(--border); }
+        .tab { flex: 1; text-align: center; padding: 14px; font-weight: 700; color: var(--text-sub); border-radius: 12px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); font-size: 14px; cursor: pointer; }
+        .tab.active { color: white; background: var(--primary); box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); }
 
-        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-        .section { display: none; }
-        .section.active { display: block; }
+        .container { padding: 0 16px; max-width: 600px; margin: 0 auto; }
+        .section { display: none; opacity: 0; transition: opacity 0.25s ease; }
+        .section.active { display: block; opacity: 1; }
 
-        .step-label { font-size: 13px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin: 18px 0 8px 2px; display: block; }
+        .step-label { font-size: 13px; font-weight: 800; color: var(--text-main); margin: 26px 0 12px 4px; display: block; letter-spacing: 0.6px; }
 
-        .switch-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        .switch-banner { display: flex; align-items: center; justify-content: space-between; background: white; padding: 14px 16px; border-radius: 14px; border: 1px solid #e2e8f0; }
-        .switch-label { font-size: 15px; font-weight: 800; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        #mode-checkbox:checked + .slider { background-color: var(--warning); }
-        input:checked + .slider:before { transform: translateX(22px); }
+        .control-card { background: var(--card-bg); padding: 18px; border-radius: var(--radius-main); box-shadow: 0 4px 16px rgba(0,0,0,0.02); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+        .selector-group { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .selector-group label { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        
+        /* 統一修改：下拉選單尺寸與外觀 */
+        select { width: 180px; height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--border); font-weight: 700; background: #f1f5f9; color: var(--text-main); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 
-        .slider-container { display: flex; overflow-x: auto; gap: 10px; padding: 4px 2px 10px 2px; margin-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* 統一修改：數量加減桿尺寸，與上方 select 完全一致 */
+        .quantity-control { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; background: #f1f5f9; overflow: hidden; width: 180px; height: 40px; }
+        .btn-qty { background: transparent; border: none; width: 45px; height: 100%; font-weight: 900; font-size: 12px; color: var(--text-sub); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-qty:active { background: var(--border); color: var(--primary); }
+        .quantity-control input { flex: 1; width: 100%; border: none; background: transparent; text-align: center; font-weight: 700; font-size: 14px; color: var(--text-main); padding: 0; pointer-events: none; }
+
+        .slider-container { display: flex; overflow-x: auto; gap: 14px; padding: 4px 4px 14px 4px; scrollbar-width: none; scroll-snap-type: x mandatory; }
         .slider-container::-webkit-scrollbar { display: none; }
-        .slider-container { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .slider-card { flex: 0 0 250px; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; cursor: pointer; background: #e2e8f0; display: flex; flex-direction: column; justify-content: flex-end; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 3px solid transparent; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); scroll-snap-align: start; }
+        .slider-card img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; transition: transform 0.4s ease; }
+        .slider-card .card-mask { background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%); width: 100%; padding: 14px 10px; position: relative; z-index: 2; text-align: center; }
+        .slider-card .card-text { color: white; font-size: 14px; font-weight: 700; line-height: 1.4; text-shadow: 0 1px 2px rgba(0,0,0,0.6); display: block; }
+        
+        .slider-card:active { transform: scale(0.96); }
+        .slider-card.active { border-color: var(--primary); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4); }
+        .slider-card.active img { transform: scale(1.06); }
+        .slider-card.active::after { content: "✓"; position: absolute; top: 12px; right: 12px; background: var(--primary); color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; z-index: 3; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 
-        .slider-card { flex: 0 0 110px; aspect-ratio: 3 / 4; border-radius: 14px; overflow: hidden; border: 2px solid #e2e8f0; cursor: pointer; background: white; display: flex; align-items: center; justify-content: center; padding: 10px; font-size: 12px; font-weight: 600; text-align: center; color: var(--text-sub); transition: 0.15s; position: relative; scroll-snap-align: start; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-        .slider-card img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-        .slider-card.active { border-color: var(--primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); transform: translateY(-2px); }
-        .slider-card.active::after { content: "✓"; position: absolute; top: 6px; right: 6px; background: var(--primary); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .custom-badge { padding: 11px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--card-bg); color: var(--text-sub); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid var(--border); }
+        .custom-badge:active { transform: scale(0.95); }
+        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 
-        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .custom-badge { padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: white; color: var(--text-sub); transition: 0.2s; }
-        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .machine-card { background: var(--card-bg); padding: 18px; border-radius: var(--radius-main); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); border: 1px solid var(--border); margin-top: 14px; }
+        .machine-text { font-size: 13px; font-weight: 700; color: #334155; line-height: 1.6; background: #f8fafc; padding: 14px; border-radius: 12px; min-height: 58px; border: 1px solid var(--border); }
+        .machine-controls { display: flex; gap: 12px; align-items: center; }
+        
+        .btn-filled { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35); }
+        .btn-filled:hover { background: #6d28d9; }
+        .btn-filled:active { transform: scale(0.96); }
+        .btn-spin { flex: 1; }
 
-        .machine-card { background: linear-gradient(135deg, #f5f3ff 0%, #edd8ff 100%); padding: 14px; border-radius: 14px; border: 1px solid #d8b4fe; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-        .machine-text { font-size: 13px; font-weight: 700; color: #581c87; line-height: 1.5; background: rgba(255,255,255,0.7); padding: 10px 12px; border-radius: 10px; min-height: 48px; }
-        .btn-spin { background: #7c3aed; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .accordion-item { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.01); }
+        .accordion-header { padding: 14px 16px; background: #ffffff; font-size: 13px; font-weight: 800; color: var(--text-main); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; transition: background 0.2s; }
+        .accordion-header:hover { background: #f8fafc; }
+        .accordion-header::after { content: "+"; font-size: 14px; color: var(--text-sub); transition: transform 0.25s; }
+        .accordion-item.open .accordion-header { background: #f1f5f9; border-bottom: 1px solid var(--border); color: var(--primary); }
+        .accordion-item.open .accordion-header::after { content: "-"; transform: rotate(180deg); color: var(--primary); }
+        .accordion-content { display: none; padding: 14px; background: #ffffff; }
+        .accordion-item.open .accordion-content { display: block; }
+        
+        textarea { width: 100%; height: 130px; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 13px; background: #f8fafc; color: var(--text-main); resize: none; font-family: inherit; line-height: 1.5; }
+        textarea:focus { border-color: var(--primary); background: #ffffff; }
+        
+        .btn-secondary { background: #64748b; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2); }
+        .btn-secondary:active { transform: scale(0.97); }
+        .btn-danger { background: #ef4444; color: white; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25); margin-top: 14px; width: 100%; }
+        .btn-danger:hover { background: #dc2626; }
 
-        .inline-row { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px 16px; border-radius: 14px; border: 1px solid #e2e8f0; margin-top: 15px; }
-        .inline-row label { font-size: 14px; font-weight: 700; }
-        .inline-row select { padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: bold; background: #f8fafc; }
+        .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 16px 16px 24px 16px; box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.08); z-index: 1000; border-radius: 24px 24px 0 0; max-width: 600px; margin: 0 auto; border-top: 1px solid var(--border); }
+        .output-text { color: var(--text-main); font-size: 12px; font-weight: 600; max-height: 95px; overflow-y: auto; margin-bottom: 14px; white-space: pre-wrap; line-height: 1.5; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+        .btn-copy-master { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-copy-master:active { transform: scale(0.97); }
 
-        .ios-uploader-box { background: #f0f2ff; border: 2px dashed #6366f1; border-radius: 12px; padding: 14px; margin-bottom: 15px; text-align: center; }
-        .ios-uploader-box p { margin: 0 0 8px 0; font-size: 13px; font-weight: bold; color: #4338ca; }
-        .btn-upload-ui { background: white; border: 1px solid #6366f1; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; color: #6366f1; display: inline-block; cursor: pointer; }
-
-        .config-card { background: white; padding: 16px; border-radius: 14px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
-        .config-card label { display: block; font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
-        textarea { width: 100%; height: 110px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-size: 13px; background: #f8fafc; resize: none; line-height: 1.4; }
-        .btn-action { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
-        .btn-secondary { background: #64748b; color: white; margin-top: 8px; }
-        .btn-danger { background: var(--danger); color: white; margin-top: 8px; }
-
-        .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; padding: 14px 16px; box-shadow: 0 -8px 20px rgba(0,0,0,0.15); z-index: 1000; border-radius: 20px 20px 0 0; max-width: 600px; margin: 0 auto; }
-        .output-text { color: #94a3b8; font-size: 12px; max-height: 60px; overflow-y: auto; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
-        .btn-copy { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 800; }
+        .toast-container { position: fixed; bottom: 210px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .toast-box { background: #1e293b; color: #ffffff; padding: 12px 22px; border-radius: 30px; font-size: 13px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.15); opacity: 0; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 6px; }
+        .toast-box.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
+<div class="toast-container" id="toast-wrapper"></div>
+
 <div class="tabs">
-    <div class="tab active" onclick="switchTab(0)">✨ 智能極速面板</div>
-    <div class="tab" onclick="switchTab(1)">⚙️ 數據預設</div>
+    <div class="tab active" onclick="switchTab(0)">智能極速面板</div>
+    <div class="tab" onclick="switchTab(1)">數據預設 (後台)</div>
 </div>
 
 <div class="container">
     <div id="section-gen" class="section active">
         
-        <div class="switch-group">
-            <div class="switch-banner">
-                <span class="switch-label" id="switch-status-text">👤 當前：單人生成模式</span>
-                <label class="switch">
-                    <input type="checkbox" id="mode-checkbox" onchange="toggleMode(this.checked)">
-                    <span class="slider"></span>
-                </label>
+        <div class="control-card">
+            <div class="selector-group">
+                <label>豆包黃金範本架構</label>
+                <select id="sel-template" onchange="updateResult()"></select>
             </div>
-            <div class="switch-banner">
-                <span class="switch-label" id="general-status-text">🌐 通用模式：關閉</span>
-                <label class="switch">
-                    <input type="checkbox" id="general-checkbox" onchange="toggleGeneralMode(this.checked)">
-                    <span class="slider"></span>
-                </label>
+            <div class="selector-group">
+                <label>動作池來源模式</label>
+                <select id="sel-action-mode" onchange="updateActionModeUI(); rollAction();"></select>
+            </div>
+            <div class="selector-group">
+                <label>相片產出數量</label>
+                <div class="quantity-control">
+                    <button class="btn-qty" onclick="changeQty(-1)">▼</button>
+                    <input type="text" id="inp-count" value="10" readonly>
+                    <button class="btn-qty" onclick="changeQty(1)">▲</button>
+                </div>
             </div>
         </div>
 
-        <span class="step-label">🧬 附加特徵多選</span>
+        <span class="step-label">附加特徵多選</span>
         <div class="badge-grid" id="features-badges-area"></div>
         
-        <span class="step-label">👗 衣服款式</span>
+        <span class="step-label">衣服款式 (左右滑動吸附)</span>
         <div class="slider-container" id="dress-slider-container"></div>
 
-        <span class="step-label">👠 鞋子配搭</span>
+        <span class="step-label">鞋子配搭</span>
         <div class="badge-grid" id="shoes-badges-area"></div>
 
-        <span class="step-label">🎬 環境場景</span>
-        <div class="badge-grid" id="scene-badges-area"></div>
+        <div id="scene-badges-block">
+            <span class="step-label">環境場景</span>
+            <div class="badge-grid" id="scene-badges-area"></div>
+        </div>
+
+        <div id="general-badges-block" style="display:none;">
+            <span class="step-label">通用動作分類</span>
+            <div class="badge-grid" id="general-badges-area"></div>
+        </div>
         
         <div class="machine-card">
-            <span id="badge-title" style="font-size: 12px; font-weight: 800; color: #6b21a8;">🚀 隨機動作激發器</span>
+            <span id="badge-title" style="font-size: 12px; font-weight: 800; color: var(--accent);">隨機動作抽取</span>
             <div id="current-action-display" class="machine-text">正在就緒...</div>
-            <button class="btn-spin" onclick="rollActionForCurrentScene()">🎲 重新抽動作提示詞</button>
+            <div class="machine-controls">
+                <button class="btn-filled btn-spin" onclick="rollAction()">重新抽取 Pose</button>
+                <select id="sel-roll-count" onchange="rollAction()" style="padding: 0 12px; width: 110px; height: 44px;">
+                    <option value="1">抽 1 條</option>
+                    <option value="2">抽 2 條</option>
+                    <option value="3" selected>抽 3 條</option>
+                    <option value="5">抽 5 條</option>
+                </select>
+            </div>
         </div>
         
-        <span class="step-label">📸 鏡頭視角</span>
+        <span class="step-label">鏡頭視角</span>
         <div class="badge-grid" id="dist-badges-area"></div>
-
-        <div class="inline-row">
-            <label>🖼️ 相片產出數量</label>
-            <select id="sel-count"></select>
-        </div>
     </div>
 
     <div id="section-cfg" class="section">
-        <div class="ios-uploader-box">
-            <p>📸 <b>iOS 本地相簿直傳生成器</b></p>
-            <label class="btn-upload-ui" for="ios-photo-picker">選擇手機照片轉化文字</label>
-            <input type="file" id="ios-photo-picker" accept="image/*" style="display:none" onchange="convertImageToBase64(this)">
+        <div id="accordion-container" style="margin-top: 14px;"></div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+            <button class="btn-secondary" onclick="exportConfig()">匯出 Json 備份</button>
+            <button class="btn-secondary" onclick="importConfig()">導入 Json 備份</button>
         </div>
-
-        <div id="config-fields"></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <button class="btn-action btn-secondary" onclick="exportConfig()">📤 匯出備份</button>
-            <button class="btn-action btn-secondary" onclick="importConfig()">📥 導入備份</button>
-        </div>
-        <button class="btn-action btn-danger" onclick="resetConfig()">⚠️ 恢復預設值</button>
+        <button class="btn-secondary btn-danger" onclick="resetConfig()">恢復系統預設值</button>
         <input type="file" id="fileInput" style="display:none" onchange="handleFile(this)">
     </div>
 </div>
 
 <div class="footer-preview">
     <div class="output-text" id="final-output"></div>
-    <button class="btn-copy" onclick="copyPrompt()">一鍵複製提示詞</button>
+    <button class="btn-copy-master" onclick="copyPrompt()">一鍵複製提示詞</button>
 </div>
 
 <script>
-    let selectedExtraFeatures = [], selectedSceneName = '', selectedShoeName = '', selectedDressLine = '', selectedDistLine = '';
-    let isDoubleMode = false, isGeneralMode = false, currentRandomAction = '';
+    let selectedExtraFeatures = [], selectedSceneName = '', selectedGeneralCat = '', selectedShoeName = '', selectedDressLine = '', selectedDistLine = '';
+    let currentRandomAction = '';
 
     const items = [
+        { id: 'templates', label: '豆包黃金範本庫（★ 命名，支援：{數量},{特徵},{衣服},{鞋子},{動作},{鏡頭},{場景}）', default: `★ 高效分段核心流\n上傳的照片人物為原型，幫我生成{數量}張照片。\n人物特徵：{特徵}\n衣服：{衣服}{鞋子}\n動作：{動作}\n角度：{鏡頭}\n場景：{場景}\n品質：超寫實 8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16\n\n★ 豆包精簡英語流\n(Realistic photography), 9:16 ratio, 8k resolution.\n[Subject]: {特徵}, wearing {衣服}, {鞋子}.\n[Action & Scene]: {動作} at {場景}.\n[Camera]: {鏡頭}, cinematic lighting.` },
         { id: 'baseFeatures', label: '1. 人物基礎核心特徵', default: '小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部' },
-        { id: 'dress', label: '2. 衣服款式', default: '黑白侍女風穿搭，帶女僕頭飾、領結同小蕾絲圍裙元素\n淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡、珍珠元素\n白色低領短袖，黑色窄裙，深色尼龍連褲襪，領口綁藍白絲巾\n無袖高領白色針織上衣、灰色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n灰色開襟襯衫、黑色領結、黑色短裙、深色尼龍連襪褲\n短袖開襟白襯衫、黑色緊身短裙、深色尼龍連褲襪、藍色掛頸ID卡，黑色皮革女裝手錶\n開襟白色長袖雪紡襯衫，灰色超短裙，藍色掛頸id卡；黑色皮革小手表\n貼身深灰西裝，白色低領內搭，深灰窄短裙，深色尼龍連褲襪\n貼身灰色西裝馬甲，白色襯衫配絲質領帶，灰色超短裙；黑色皮革小手表\n白色短袖襯衫長裙，領口帶細長藍色絲帶，綠色線條校徽\n貼身泳池穿搭，粉色系三件式綁帶風格，豐滿曲線誇張\n黑色兩件式內搭，蕾絲露腰風格，吊帶襪\n白色色兩件式內搭，蕾絲露腰風格, 吊帶襪, 小護士帽' },
+        { id: 'dress', label: '2. 衣服款式 (圖片網址 | 提示詞描述)', default: `https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300 | 黑白侍女風短裙穿搭，帶女僕頭飾、領結與蕾絲圍裙元素\nhttps://images.unsplash.com/photo-1612336307429-8a898d10e223?w=300 | 淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡\nhttps://images.unsplash.com/photo-1539008885759-436d81b1337c?w=300 | 白色低領短袖，黑色窄裙，深色尼 nylon 連褲襪，領口綁藍白絲巾\nhttps://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300 | 無袖高領白色針織上衣、灰色緊身短裙、深色尼 nylon 連褲襪\nhttps://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=300 | 灰色開襟襯衫、黑色領結、黑色短裙、深色尼 nylon 連襪褲` },
         { id: 'shoes', label: '3. 鞋子款式', default: '光腳無鞋子\n黑色高跟鞋\n黑色高跟涼鞋\n白襪' },
-        { id: 'dist', label: '4. 鏡頭角度與距離', default: '極致臉部大特寫，臉部占畫面50%以上\n中景\n近景\n俯視全身超廣角\n仰視全身超廣角' },
-        { id: 'scene', label: '5. 場景與背景', default: `# 攝影棚白色背景\n# 辦公室\n獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭\n手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態\n站在落地窗前微側身，眺望遠方\n雙臂交叉胸前，背靠辦公椅\n單手拿著原子筆，微微轉頭對著鏡頭\n手持觸控筆停在螢幕前，眼神專注地側臉面對鏡頭\n抱著筆電漫步走廊，步伐輕盈且自信地看向前方\n身體微微前傾，雙手交疊在合約上展現幹練氣質\n手拿雷射筆指向白板，身體微側展現完美身材線條\n單手扶著書架邊緣，微微仰頭尋找書籍展現俐落側影\n# 酒店房間\n# 教室\n# 室內運動場\n# 戶外游泳池\n# 高級美容院` },
-        { id: 'sceneCount', label: '5b. 場景模式每次抽取動作數量', default: '3' },
-        { id: 'twoperson', label: '6. 雙人模式獨立動作池', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力神陷進其胯間衣料中，將其狠狠向後扣緊，兩人的雙腿在重力下完全交疊' },
-        { id: 'twopersonCount', label: '6b. 雙人模式每次抽取動作數量', default: '1' },
-        { id: 'features', label: '7. 附加特徵池', default: '銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡\n黑色頸圈\n黑色金屬手扣\n全身沾有濃稠凡士林' },
-        { id: 'generalPool', label: '8. 🌐 通用模式動作池', default: '韓系純欲風雜誌姿態，雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾，雙手略帶羞澀地交疊在雙腿間，眼神清澈且帶有一絲無辜與誘惑\nArtgravia經典微醺慵懶感，半靠在沙發扶手上，一隻手漫不經心地輕拉衣領，另一隻手放鬆垂下，雙腿微側交疊，展現流暢的S型腰臀曲線\n高級性感寫真定格，身體背對鏡頭呈45度扭轉，單手輕托下巴微微回眸，眼神帶著一絲冷艷與疏離，完美拉長頸部與肩背線條\n極致不對稱動態感，重心完全移向一側大腿，單手放鬆插在裙側，另一手輕撥弄耳邊碎髮，嘴唇微張，雙肩一高一低營造抓拍氛圍\n清純與嫵媚交織，坐在床沿，上身微微向後仰，雙手向後撐住床墊，修長的雙腿自然一前一後錯開，極致拉伸腹部與修長腿部線條\n空氣感寫真姿態，微微低頭，眼神避開正對鏡頭、漫不經心地看向斜下方，單手手指輕輕搭在肩膀衣帶上，呈現帶有故事感的鬆弛感\n居家慵懶雜誌風，整個人微蜷縮在單人沙發上，雙手抱膝，下巴輕輕抵在膝蓋上，眼神直視鏡頭，帶有一種讓人想保護的脆弱與性感\nArtgravia招牌肢體張力，微側身站立，雙手自然向後上方微伸作伸懶腰狀，上圍線條自然挺拔，腰部微凹，展現極致的女性身體弧度\n強烈故事感眼神殺，身體微微前傾，雙臂交疊支撐在桌面上，下巴微收，雙眸帶有強烈情感地「由下往上」深情凝視鏡頭\n膠片寫真抓拍動態，邁開輕盈步伐呈行走定格，單手輕拉裙擺，身體線條隨步伐自然延伸，頭髮微亂，充滿空氣感的瞬間捕捉\n法式慵懶性感，側臥在凌亂的白色床單上，單肘支撐頭部，另一隻手輕撫在胯骨處，腰部微沉，雙腿微曲，眼神迷離地看著鏡頭\n時尚雜誌封面姿態，雙腳微微張開站立，雙手自然垂下但指尖微張，頭部微微向一側歪斜，眼神冷酷，帶有高級厭世臉的純欲感\n不經意地靠在窗邊，單手手背輕抵著額頭，陽光灑在側臉上，身體微微扭轉迎向光源，展現極致精緻的五官與鎖骨線條\n性感跪姿定格，雙膝張開跪坐在腳踝上，雙手向上輕托著後腦勺的頭髮，手肘向向兩側打開，極致展現腰部收緊與上半身挺拔的線條\n隨性街拍風，身體微微靠向一側牆面，一隻腳底抵住牆壁，單手自然垂下，另一隻手勾住掛頸卡帶，神情放鬆且自信地直視鏡頭' },
-        { id: 'generalCount', label: '9. 🌐 通用模式每次抽取動作數量', default: '3' },
-        { id: 'count', label: '生成數量', default: '10\n1\n4\n9' }
+        { id: 'dist', label: '4. 鏡頭角度與距離', default: '中景\n近景\n俯視近景\n俯視全身超廣角\n仰視全身超廣角' },
+        { id: 'scene', label: '5. 場景專屬動作池 (支援 # 命名分組)', default: `# 白色房間\n坐在地上，拉開衣領，頭微微垂下，眼睛向上望鏡頭\n靠在窗簾旁，單手拉起裙擺，若有所思地望向窗外\n躺在毛毯上，雙腿微曲交疊，雙手抱著巨型玩具熊\n# 辦公室\n獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭\n手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態\n站在落地窗前微側身，眺望遠方` },
+        { id: 'generalPool', label: '6. 通用純欲動作池 (支援 # 命名分組)', default: `# 韓系純欲\n韓系純欲風雜姿態，雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾，雙手略帶羞澀地交疊在雙腿間，眼神清澈且帶有一絲無辜與誘惑\n# 慵懶微醺\nArtgravia經典微醺慵懶感，半靠在沙發扶手上，一隻手漫不經心地輕拉衣領，另一隻手放鬆垂下，雙腿微側交疊，展現流暢的S型腰臀曲線\n# 絲襪制服\n輕撫黑絲邊緣，修長雙腿微微交疊，展現極致誘惑的制服感` },
+        { id: 'twoperson', label: '7. 雙人互動動作池', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍，指尖用力深陷進其胯間衣料中' },
+        { id: 'features', label: '8. 附加特徵池', default: '法式瀏海\n腮紅\n銀色耳環\n細框無鏡片眼鏡\n黑色細框圓眼鏡' },
+        { id: 'count', label: '9. 生成數量預設', default: '10\n1\n4\n9' }
     ];
 
+    function toast(message) {
+        const wrapper = document.getElementById('toast-wrapper');
+        const box = document.createElement('div');
+        box.className = 'toast-box';
+        box.innerHTML = `<span>${message}</span>`;
+        wrapper.appendChild(box);
+        setTimeout(() => box.classList.add('show'), 50);
+        setTimeout(() => {
+            box.classList.remove('show');
+            setTimeout(() => box.remove(), 300);
+        }, 2200);
+    }
+
     function init() {
-        const configArea = document.getElementById('config-fields');
-        configArea.innerHTML = ''; 
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'config-card';
-            card.innerHTML = `<label>${item.label}</label><textarea id="cfg-${item.id}"></textarea>`;
-            configArea.appendChild(card);
+        const accordionContainer = document.getElementById('accordion-container');
+        accordionContainer.innerHTML = ''; 
+        
+        items.forEach((item) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'accordion-item';
+            wrap.innerHTML = `
+                <div class="accordion-header" onclick="toggleAccordion(this)">${item.label.split('（')[0].split('(')[0]}</div>
+                <div class="accordion-content">
+                    <textarea id="cfg-${item.id}"></textarea>
+                </div>
+            `;
+            accordionContainer.appendChild(wrap);
+
             const textarea = document.getElementById(`cfg-${item.id}`);
             textarea.value = localStorage.getItem(`cfg-${item.id}`) || item.default;
             textarea.addEventListener('input', () => {
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
+                if (item.id === 'templates') renderTemplateSelector();
                 syncDataFromConfig();
             });
         });
+
+        const modeSel = document.getElementById('sel-action-mode');
+        modeSel.innerHTML = `
+            <option value="scene">場景連動隨機</option>
+            <option value="general">通用純欲隨機</option>
+            <option value="double">雙人互動隨機</option>
+        `;
+
+        renderTemplateSelector();
         syncDataFromConfig();
-        document.getElementById('sel-count').addEventListener('change', updateResult);
-        rollActionForCurrentScene();
+        rollAction();
     }
 
-    function convertImageToBase64(input) {
-        if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = function () {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxW = 300; 
-                const scale = maxW / img.width;
-                canvas.width = maxW;
-                canvas.height = img.height * scale;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                const promptDesc = prompt("請輸入呢件衫嘅 AI 提示詞描述：", "客製化本地服飾");
-                if (promptDesc === null) return;
-
-                const txtArea = document.getElementById('cfg-dress');
-                const currentVal = txtArea.value.trim();
-                txtArea.value = currentVal + (currentVal ? '\n' : '') + `${compressedBase64} | ${promptDesc}`;
-                localStorage.setItem('cfg-dress', txtArea.value);
-                syncDataFromConfig();
-            };
-        };
-        reader.readAsDataURL(file);
-        input.value = '';
+    function toggleAccordion(header) {
+        const item = header.parentElement;
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.accordion-item').forEach(el => el.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
     }
 
-    function parseLineData(line) {
-        if (!line) return { img: '', text: '' };
-        if (line.includes('|')) {
-            const parts = line.split('|');
-            return { img: parts[0].trim(), text: parts[1].trim() };
-        }
-        return { img: '', text: line.trim() };
+    function renderTemplateSelector() {
+        const sel = document.getElementById('sel-template');
+        const curr = sel.value;
+        const templates = parseTemplates();
+        sel.innerHTML = templates.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+        if (templates.some(t => t.name === curr)) sel.value = curr;
+    }
+
+    function parseTemplates() {
+        const raw = document.getElementById('cfg-templates').value;
+        const blocks = raw.split(/\n(?=★)/);
+        return blocks.map(b => {
+            const lines = b.trim().split('\n');
+            const name = lines[0].replace('★', '').trim();
+            const content = lines.slice(1).join('\n');
+            return { name, content };
+        }).filter(t => t.name);
+    }
+
+    function parseGroupedLines(rawText, defaultName) {
+        const lines = rawText.split('\n');
+        const list = []; let cur = null;
+        lines.forEach(l => {
+            const t = l.trim(); if(!t) return;
+            if(t.startsWith('#')) { cur = { name: t.substring(1).trim(), actions: [] }; list.push(cur); }
+            else { if(cur) cur.actions.push(t); else { cur = { name: defaultName, actions: [t] }; list.push(cur); } }
+        });
+        return list;
     }
 
     function syncDataFromConfig() {
         renderClothesSlider();
         renderDistBadges(); 
 
-        const countSelect = document.getElementById('sel-count');
-        const currCount = countSelect.value;
+        const countInput = document.getElementById('inp-count');
         const countLines = document.getElementById('cfg-count').value.split('\n').filter(l=>l.trim());
-        countSelect.innerHTML = countLines.map(l=>`<option value="${l}">${l}</option>`).join('');
-        if(countLines.includes(currCount)) countSelect.value = currCount;
+        if (countLines.length > 0 && countInput.value === '10' && countInput.dataset.modified !== 'true') {
+            countInput.value = countLines[0];
+        }
 
         renderFeaturesBadges();
         renderShoesBadges();
+        updateActionModeUI();
+    }
+
+    function changeQty(amt) {
+        const countInput = document.getElementById('inp-count');
+        let currentVal = parseInt(countInput.value) || 1;
+        currentVal += amt;
+        if (currentVal < 1) currentVal = 1;
+        if (currentVal > 100) currentVal = 100;
+        countInput.value = currentVal;
+        countInput.dataset.modified = 'true';
+        updateResult();
+    }
+
+    function updateActionModeUI() {
+        const mode = document.getElementById('sel-action-mode').value;
+        const sceneBlock = document.getElementById('scene-badges-block');
+        const generalBlock = document.getElementById('general-badges-block');
+
+        sceneBlock.style.display = 'block';
         renderSceneBadges();
+
+        if (mode === 'general') {
+            generalBlock.style.display = 'block';
+            renderGeneralBadges();
+        } else {
+            generalBlock.style.display = 'none';
+        }
         updateResult();
     }
 
@@ -249,14 +340,18 @@
             const card = document.createElement('div');
             card.className = 'slider-card' + (line === selectedDressLine ? ' active' : '');
             
-            if(data.img) {
-                const img = document.createElement('img');
-                img.src = data.img;
-                card.appendChild(img);
-            } else {
-                card.innerText = data.text;
-            }
-            
+            const img = document.createElement('img'); 
+            img.src = data.img || 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300';
+            card.appendChild(img);
+
+            const mask = document.createElement('div');
+            mask.className = 'card-mask';
+            const txt = document.createElement('span');
+            txt.className = 'card-text';
+            txt.innerText = data.text; 
+            mask.appendChild(txt);
+            card.appendChild(mask);
+
             card.onclick = () => {
                 selectedDressLine = line;
                 document.querySelectorAll('.slider-card').forEach(c => c.classList.remove('active'));
@@ -308,7 +403,6 @@
         const area = document.getElementById('dist-badges-area');
         area.innerHTML = '';
         if(!selectedDistLine || !distLines.includes(selectedDistLine)) selectedDistLine = distLines[0] || '';
-
         distLines.forEach(line => {
             const data = parseLineData(line);
             const b = document.createElement('div');
@@ -316,19 +410,16 @@
             b.innerText = data.text;
             b.onclick = () => {
                 document.querySelectorAll('#dist-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
-                b.classList.add('active');
-                selectedDistLine = line;
-                updateResult();
+                b.classList.add('active'); selectedDistLine = line; updateResult();
             };
             area.appendChild(b);
         });
     }
 
     function renderSceneBadges() {
-        const parsed = parseScenes();
+        const parsed = parseGroupedLines(document.getElementById('cfg-scene').value, '預設場景');
         const area = document.getElementById('scene-badges-area');
-        area.innerHTML = '';
-        if(!parsed.length) return;
+        area.innerHTML = ''; if(!parsed.length) return;
         if(!selectedSceneName || !parsed.some(p=>p.name === selectedSceneName)) selectedSceneName = parsed[0].name;
         parsed.forEach(sc => {
             const b = document.createElement('div');
@@ -337,59 +428,58 @@
             b.onclick = () => {
                 document.querySelectorAll('#scene-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
                 b.classList.add('active'); selectedSceneName = sc.name;
-                rollActionForCurrentScene();
+                
+                if (document.getElementById('sel-action-mode').value === 'scene') {
+                    rollAction();
+                } else {
+                    updateResult();
+                }
             };
             area.appendChild(b);
         });
     }
 
-    function parseScenes() {
-        const lines = document.getElementById('cfg-scene').value.split('\n');
-        const list = []; let cur = null;
-        lines.forEach(l => {
-            const t = l.trim(); if(!t) return;
-            if(t.startsWith('#')) { cur = { name: t.substring(1).trim(), actions: [] }; list.push(cur); }
-            else { if(cur) cur.actions.push(t); else list.push({ name: '預設場景', actions: [t] }); }
+    function renderGeneralBadges() {
+        const parsed = parseGroupedLines(document.getElementById('cfg-generalPool').value, '通用預設');
+        const area = document.getElementById('general-badges-area');
+        area.innerHTML = ''; if(!parsed.length) return;
+        if(!selectedGeneralCat || !parsed.some(p=>p.name === selectedGeneralCat)) selectedGeneralCat = parsed[0].name;
+        parsed.forEach(cat => {
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (cat.name === selectedGeneralCat ? ' active' : '');
+            b.innerText = cat.name;
+            b.onclick = () => {
+                document.querySelectorAll('#general-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
+                b.classList.add('active'); selectedGeneralCat = cat.name; rollAction();
+            };
+            area.appendChild(b);
         });
-        return list;
     }
 
-    function rollActionForCurrentScene() {
+    function rollAction() {
+        const mode = document.getElementById('sel-action-mode').value;
+        const maxRoll = parseInt(document.getElementById('sel-roll-count').value) || 3;
         let pool = [];
-        const title = document.getElementById('badge-title');
-        let maxRoll = 3; 
-        
-        if (isGeneralMode) {
-            pool = document.getElementById('cfg-generalPool').value.split('\n').filter(l=>l.trim());
-            const gCountEl = document.getElementById('cfg-generalCount');
-            maxRoll = gCountEl ? (parseInt(gCountEl.value) || 3) : 3;
-            if (maxRoll < 1) maxRoll = 1;
-            title.innerText = `🌐 通用模式：隨機抽取 ${maxRoll} 條 Pose`;
-        } else if (isDoubleMode) {
-            pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
-            const dCountEl = document.getElementById('cfg-twopersonCount');
-            maxRoll = dCountEl ? (parseInt(dCountEl.value) || 1) : 1;
-            if (maxRoll < 1) maxRoll = 1;
-            title.innerText = `👥 雙人模式：隨機抽取 ${maxRoll} 條 Pose`;
-        } else {
-            // 🌟 升級場景模式：全面對齊通用模式抽取邏輯
-            const match = parseScenes().find(p=>p.name === selectedSceneName);
+
+        if (mode === 'general') {
+            const parsed = parseGroupedLines(document.getElementById('cfg-generalPool').value, '通用預設');
+            const match = parsed.find(p=>p.name === selectedGeneralCat);
             if(match) pool = [...match.actions];
-            const sCountEl = document.getElementById('cfg-sceneCount');
-            maxRoll = sCountEl ? (parseInt(sCountEl.value) || 3) : 3;
-            if (maxRoll < 1) maxRoll = 1;
-            title.innerText = `👤 ${selectedSceneName} 模式：隨機抽取 ${maxRoll} 條 Pose`;
+        } else if (mode === 'double') {
+            pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
+        } else {
+            const parsed = parseGroupedLines(document.getElementById('cfg-scene').value, '預設場景');
+            const match = parsed.find(p=>p.name === selectedSceneName);
+            if(match) pool = [...match.actions];
         }
 
         if(pool.length > 0) {
-            let res = []; 
+            let res = []; let poolCopy = [...pool];
             const finalMax = Math.min(maxRoll, pool.length);
-            let poolCopy = [...pool];
-            for(let i=0; i<finalMax; i++) { 
-                if(poolCopy.length === 0) break;
-                res.push(poolCopy.splice(Math.floor(Math.random()*poolCopy.length), 1)[0]); 
+            for(let i=0; i<finalMax; i++) {
+                res.push(poolCopy.splice(Math.floor(Math.random()*poolCopy.length), 1)[0]);
             }
-            currentRandomAction = res.join('；'); 
+            currentRandomAction = res.join('，');
         } else {
             currentRandomAction = '自然放鬆的姿態';
         }
@@ -398,53 +488,49 @@
     }
 
     function updateResult() {
-        const countVal = document.getElementById('sel-count').value || '10';
-        const modeText = isDoubleMode ? "（雙人互動模式）" : "";
-        
-        const baseFeatInput = document.getElementById('cfg-baseFeatures');
-        let finalFeat = baseFeatInput ? baseFeatInput.value.trim() : "小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部";
-        
-        if(selectedExtraFeatures.length > 0) finalFeat += "，" + selectedExtraFeatures.join('、');
-        const shoePrompt = selectedShoeName ? `，${selectedShoeName}` : "";
+        const countInput = document.getElementById('inp-count');
+        const countVal = countInput.value || '10';
 
+        const baseFeat = document.getElementById('cfg-baseFeatures').value.trim();
+        const extraFeat = selectedExtraFeatures.length > 0 ? "、" + selectedExtraFeatures.join('、') : "";
+        const fullFeatures = baseFeat + extraFeat;
+        
+        const shoePrompt = selectedShoeName ? `，踏著${selectedShoeName}` : "";
         const pureDressText = parseLineData(selectedDressLine).text;
         const pureDistText = parseLineData(selectedDistLine).text;
 
-        const template = `上傳的照片人物為原型${modeText}，幫我生成${countVal}張照片。
-人物特徵：${finalFeat}
-衣服：極致輕薄的${pureDressText}${shoePrompt}
-動作：${currentRandomAction}
-角度：${pureDistText}
-場景：${selectedSceneName}
-品質：超寫實 8K，細節拉滿，無任何模糊，真實攝影質感，比例 9:16`;
+        const templateName = document.getElementById('sel-template').value;
+        const targetTemplate = parseTemplates().find(t => t.name === templateName);
 
-        document.getElementById('final-output').innerText = template;
-    }
-
-    function toggleMode(checked) {
-        isDoubleMode = checked;
-        document.getElementById('switch-status-text').innerText = isDoubleMode ? '👥 當前：雙人生成模式' : '👤 當前：單人生成模式';
-        document.getElementById('switch-status-text').style.color = isDoubleMode ? 'var(--warning)' : 'var(--text-main)';
-        rollActionForCurrentScene();
-    }
-
-    function toggleGeneralMode(checked) {
-        isGeneralMode = checked;
-        document.getElementById('general-status-text').innerText = isGeneralMode ? '🌐 通用模式：開啟' : '🌐 通用模式：關閉';
-        document.getElementById('general-status-text').style.color = isGeneralMode ? 'var(--primary)' : 'var(--text-main)';
-        rollActionForCurrentScene();
-    }
-
-    function resetConfig() {
-        if(confirm('確定要還原預設文字？')) {
-            items.forEach(item => localStorage.removeItem(`cfg-${item.id}`));
-            init();
+        let finalOutput = "";
+        if (targetTemplate) {
+            finalOutput = targetTemplate.content
+                .replace(/{數量}/g, countVal)
+                .replace(/{特徵}/g, fullFeatures)
+                .replace(/{衣服}/g, pureDressText)
+                .replace(/{鞋子}/g, shoePrompt)
+                .replace(/{動作}/g, currentRandomAction)
+                .replace(/{鏡頭}/g, pureDistText)
+                .replace(/{場景}/g, selectedSceneName);
         }
+
+        document.getElementById('final-output').innerText = finalOutput;
     }
+
+    function parseLineData(line) {
+        if (!line) return { img: '', text: '' };
+        if (line.includes('|')) {
+            const parts = line.split('|');
+            return { img: parts[0].trim(), text: parts[1].trim() };
+        }
+        return { img: '', text: line.trim() };
+    }
+    function resetConfig() { if(confirm('確定要清除所有自訂內容，還原系統預設值？')) { items.forEach(item => localStorage.removeItem(`cfg-${item.id}`)); document.getElementById('inp-count').dataset.modified = 'false'; init(); toast('已恢復系統出廠預設值'); } }
     function exportConfig() {
         const data = {}; items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
-        a.download = `prompt_v6.2_multi.json`; a.click();
+        a.download = `prompt_v9.3_master.json`; a.click();
+        toast('Json 備份檔案已成功匯出');
     }
     function importConfig() { document.getElementById('fileInput').click(); }
     function handleFile(input) {
@@ -452,7 +538,8 @@
         reader.onload = (e) => {
             const data = JSON.parse(e.target.result);
             items.forEach(item => { if(data[item.id]) { document.getElementById(`cfg-${item.id}`).value = data[item.id]; localStorage.setItem(`cfg-${item.id}`, data[item.id]); } });
-            syncDataFromConfig(); rollActionForCurrentScene(); alert('導入成功！');
+            document.getElementById('inp-count').dataset.modified = 'false';
+            renderTemplateSelector(); syncDataFromConfig(); rollAction(); toast('數據配置已導入');
         };
         reader.readAsText(input.files[0]);
     }
@@ -464,8 +551,7 @@
     }
     function copyPrompt() {
         navigator.clipboard.writeText(document.getElementById('final-output').innerText).then(() => {
-            const btn = document.querySelector('.btn-copy'); btn.innerText = '✅ 提示詞已複製！';
-            setTimeout(() => btn.innerText = '一鍵複製提示詞', 1500);
+            toast('提示詞已成功複製至剪貼簿');
         });
     }
 
