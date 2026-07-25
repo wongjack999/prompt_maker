@@ -2,223 +2,419 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Prompt Pro 9.5 Slim</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AI Prompt Pro - Pure Manual Image Mode</title>
+    <!-- Google Material Symbols (Outlined) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         :root { 
-            --bg: #f1f5f9; 
-            --card-bg: #ffffff; 
-            --text-main: #0f172a; 
-            --text-sub: #64748b; 
-            --primary: #4f46e5; 
-            --primary-glow: rgba(79, 70, 229, 0.12);
-            --accent: #7c3aed; 
-            --border: #e2e8f0;
-            --radius-main: 14px;
+            --md-bg: #f8f9ff;
+            --md-surface: #ffffff;
+            --md-surface-low: #f0f4f9;
+            --md-surface-high: #e1e6f0;
+            --md-primary: #0b57d0;
+            --md-primary-hover: #0842a0;
+            --md-primary-container: #d3e3fd;
+            --md-on-primary-container: #041e49;
+            --md-text-main: #1f1f1f;
+            --md-text-sub: #444746;
+            --md-outline: #c4c7c5;
+            --md-outline-variant: #e1e3e1;
+            
+            --radius-pill: 28px;
+            --radius-card: 20px;
+            --radius-sm: 12px;
+            
+            --elevation-1: 0px 1px 3px rgba(0, 0, 0, 0.08), 0px 1px 2px rgba(0, 0, 0, 0.06);
+            --elevation-2: 0px 4px 8px rgba(0, 0, 0, 0.08);
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding-bottom: 240px; color: var(--text-main); }
+        body { 
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--md-bg); 
+            margin: 0; 
+            padding-bottom: 240px; 
+            color: var(--md-text-main);
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .material-symbols-outlined {
+            font-size: 22px;
+            color: var(--md-primary);
+            vertical-align: middle;
+        }
         
-        .tabs { display: flex; background: var(--card-bg); padding: 4px; margin: 12px; border-radius: var(--radius-main); box-shadow: 0 2px 10px rgba(15,23,42,0.03); position: sticky; top: 12px; z-index: 100; border: 1px solid var(--border); }
-        .tab { flex: 1; text-align: center; padding: 11px; font-weight: 700; color: var(--text-sub); border-radius: 10px; transition: all 0.2s ease; font-size: 13px; cursor: pointer; }
-        .tab.active { color: white; background: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .app-header {
+            position: sticky;
+            top: 0;
+            background: var(--md-bg);
+            padding: 12px 16px 8px 16px;
+            z-index: 900;
+        }
+        .tabs { 
+            display: flex; 
+            background: var(--md-surface-low); 
+            padding: 4px; 
+            border-radius: var(--radius-pill); 
+            border: 1px solid var(--md-outline-variant);
+        }
+        .tab { 
+            flex: 1; 
+            text-align: center; 
+            padding: 12px; 
+            font-weight: 700; 
+            color: var(--md-text-sub); 
+            border-radius: var(--radius-pill); 
+            transition: all 0.2s ease; 
+            font-size: 15px; 
+            cursor: pointer; 
+        }
+        .tab.active { 
+            color: var(--md-on-primary-container); 
+            background: var(--md-surface); 
+            box-shadow: var(--elevation-1); 
+        }
 
-        .container { padding: 0 12px; max-width: 600px; margin: 0 auto; }
-        .section { display: none; opacity: 0; }
-        .section.active { display: block; opacity: 1; }
+        .container { padding: 0 16px; max-width: 600px; margin: 0 auto; }
+        .section { display: none; }
+        .section.active { display: block; }
 
-        .step-header { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 8px 4px; }
-        .step-label { font-size: 12px; font-weight: 800; color: var(--text-main); letter-spacing: 0.5px; margin: 0; text-transform: uppercase; }
-        .btn-text-link { font-size: 11px; font-weight: 700; color: var(--text-sub); background: none; border: none; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
-        .btn-text-link:active { background: #e2e8f0; }
+        .step-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin: 22px 4px 10px 4px; 
+        }
+        .step-label { 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: var(--md-text-main); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-reset { 
+            font-size: 13px; 
+            font-weight: 700; 
+            color: #b91c1c; 
+            background: #fef2f2; 
+            border: 1px solid #fecaca; 
+            cursor: pointer; 
+            padding: 6px 14px; 
+            border-radius: var(--radius-pill);
+            transition: all 0.15s ease;
+        }
 
-        /* 控制面板緊湊化 */
-        .control-card { background: var(--card-bg); padding: 14px; border-radius: var(--radius-main); box-shadow: 0 2px 12px rgba(0,0,0,0.01); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-        .selector-group { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .selector-group label { font-size: 13px; font-weight: 700; color: var(--text-main); }
-        
-        select { width: 170px; height: 36px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border); font-weight: 700; background: #f8fafc; color: var(--text-main); font-size: 12px; cursor: pointer; }
-
-        .quantity-control { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; overflow: hidden; width: 170px; height: 36px; }
-        .btn-qty { background: transparent; border: none; width: 42px; height: 100%; font-weight: 900; font-size: 11px; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-qty:active { background: #e2e8f0; }
-        .quantity-control input { flex: 1; width: 100%; border: none; background: transparent; text-align: center; font-weight: 700; font-size: 13px; color: var(--text-main); pointer-events: none; }
-
-        /* 盲盒超級按鈕 */
-        .btn-shuffle-master { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent) 0%, #6d28d9 100%); color: white; border: none; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25); transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-shuffle-master:active { transform: scale(0.98); }
-
-        /* 橫向衣服卡片微調 */
-        .slider-container { display: flex; overflow-x: auto; gap: 10px; padding: 2px 2px 10px 2px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+        .slider-container { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 12px; 
+            padding: 4px 2px 14px 2px; 
+            scrollbar-width: none; 
+            scroll-snap-type: x mandatory; 
+        }
         .slider-container::-webkit-scrollbar { display: none; }
-        .slider-card { flex: 0 0 190px; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; cursor: pointer; background: #e2e8f0; display: flex; flex-direction: column; justify-content: flex-end; position: relative; border: 3px solid transparent; transition: all 0.2s ease; scroll-snap-align: start; }
-        .slider-card img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-        .slider-card .card-mask { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 80%); width: 100%; padding: 10px 8px; position: relative; z-index: 2; text-align: center; }
-        .slider-card .card-text { color: white; font-size: 12px; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .slider-card.active { border-color: var(--primary); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .slider-card { 
+            flex: 0 0 160px; 
+            aspect-ratio: 4 / 5; 
+            border-radius: var(--radius-card); 
+            overflow: hidden; 
+            cursor: pointer; 
+            background: var(--md-surface-high); 
+            position: relative; 
+            border: 2px solid transparent; 
+            transition: all 0.2s ease; 
+            scroll-snap-align: start; 
+            box-shadow: var(--elevation-1);
+        }
+        .slider-card img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            background: var(--md-surface-low);
+        }
+        .slider-card .card-mask { 
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%); 
+            width: 100%; 
+            padding: 12px 10px; 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            z-index: 2; 
+            text-align: center; 
+        }
+        .slider-card .card-text { 
+            color: #ffffff; 
+            font-size: 14px; 
+            font-weight: 700; 
+            display: block; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        .slider-card.active { 
+            border-color: var(--md-primary); 
+            box-shadow: 0 0 0 2px var(--md-primary-container);
+        }
 
-        .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-        .custom-badge { padding: 9px 13px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; background: var(--card-bg); color: var(--text-sub); border: 1px solid var(--border); transition: all 0.15s; }
-        .custom-badge.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+        .custom-badge { 
+            padding: 10px 18px; 
+            border-radius: var(--radius-pill); 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            background: var(--md-surface); 
+            color: var(--md-text-sub); 
+            border: 1px solid var(--md-outline); 
+            transition: all 0.15s ease; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+        }
+        .custom-badge.active { 
+            background: var(--md-primary-container); 
+            color: var(--md-on-primary-container); 
+            border-color: var(--md-primary); 
+            font-weight: 800;
+        }
 
-        /* 動作池分段選擇器 (Segmented Control) 代替下拉框 */
-        .segmented-control { display: flex; background: #e2e8f0; padding: 3px; border-radius: 10px; margin-bottom: 10px; gap: 2px; }
-        .segment-btn { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 700; color: var(--text-sub); border-radius: 8px; cursor: pointer; transition: all 0.15s; }
-        .segment-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .select-wrapper { position: relative; margin-bottom: 8px; }
+        .md-select {
+            width: 100%;
+            padding: 14px 44px 14px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--md-text-main);
+            background: var(--md-surface);
+            border: 1px solid var(--md-outline);
+            border-radius: var(--radius-sm);
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            box-shadow: var(--elevation-1);
+            font-family: inherit;
+        }
+        .select-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--md-text-sub);
+        }
 
-        /* 隨機抽取面版優化 */
-        .machine-card { background: var(--card-bg); padding: 14px; border-radius: var(--radius-main); display: flex; flex-direction: column; box-shadow: 0 2px 12px rgba(0,0,0,0.01); border: 1px solid var(--border); margin-top: 14px; }
-        .machine-text { font-size: 12px; font-weight: 700; color: #334155; line-height: 1.5; background: #f8fafc; padding: 12px; border-radius: 10px; min-height: 52px; border: 1px solid var(--border); margin-bottom: 10px; }
-        .machine-card.locked .machine-text { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
-        .machine-controls { display: flex; gap: 8px; align-items: center; }
-        
-        .btn-filled { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; transition: transform 0.1s; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.2); }
-        .btn-filled:active { transform: scale(0.97); }
-        .btn-spin { flex: 1; }
-        
-        .btn-lock { background: #f8fafc; color: var(--text-sub); border: 1px solid var(--border); padding: 0 14px; height: 42px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .btn-lock.active { background: #ecfdf5; color: #10b981; border-color: #a7f3d0; }
-
-        .accordion-item { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); margin-bottom: 8px; overflow: hidden; }
-        .accordion-header { padding: 12px 14px; font-size: 12px; font-weight: 800; color: var(--text-main); cursor: pointer; display: flex; justify-content: space-between; }
-        .accordion-content { display: none; padding: 12px; background: #ffffff; }
+        .accordion-item { 
+            background: var(--md-surface); 
+            border-radius: var(--radius-card); 
+            border: 1px solid var(--md-outline-variant); 
+            margin-bottom: 12px; 
+            overflow: hidden; 
+            box-shadow: var(--elevation-1);
+        }
+        .accordion-header { 
+            padding: 16px 20px; 
+            font-size: 15px; 
+            font-weight: 700; 
+            color: var(--md-text-main); 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .accordion-content { display: none; padding: 0 16px 16px 16px; }
         .accordion-item.open .accordion-content { display: block; }
-        .accordion-item.open .accordion-header { background: #f8fafc; border-bottom: 1px solid var(--border); color: var(--primary); }
+        .accordion-item.open .accordion-header { color: var(--md-primary); }
         
-        textarea { width: 100%; height: 120px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 12px; background: #f8fafc; resize: none; font-family: inherit; }
+        textarea { 
+            width: 100%; 
+            height: 130px; 
+            border: 1px solid var(--md-outline); 
+            border-radius: var(--radius-sm); 
+            padding: 12px; 
+            font-size: 14px; 
+            background: var(--md-surface-low); 
+            resize: none; 
+            color: var(--md-text-main); 
+            font-family: inherit; 
+            line-height: 1.5;
+        }
         
-        .btn-secondary { background: #64748b; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; }
-        .btn-danger { background: #ef4444; width: 100%; margin-top: 10px; }
+        .btn-m3 { 
+            background: var(--md-surface); 
+            color: var(--md-primary); 
+            border: 1px solid var(--md-outline); 
+            padding: 14px; 
+            border-radius: var(--radius-pill); 
+            font-weight: 700; 
+            font-size: 15px; 
+            cursor: pointer; 
+            min-height: 48px;
+        }
+        .btn-danger { color: #dc2626; border-color: #fca5a5; background: #fef2f2; width: 100%; margin-top: 14px; }
 
-        /* 底部固定 Preview */
-        .footer-preview { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 12px 12px 20px 12px; box-shadow: 0 -8px 30px rgba(15, 23, 42, 0.06); z-index: 1000; border-radius: 20px 20px 0 0; max-width: 600px; margin: 0 auto; border-top: 1px solid var(--border); }
-        .output-text { color: var(--text-main); font-size: 12px; font-weight: 600; max-height: 80px; overflow-y: auto; margin-bottom: 10px; white-space: pre-wrap; line-height: 1.4; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
-        .btn-copy-master { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3); cursor: pointer; }
-        .btn-copy-master:active { transform: scale(0.98); }
+        .footer-preview { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: var(--md-surface); 
+            padding: 16px 16px calc(16px + env(safe-area-inset-bottom)) 16px; 
+            box-shadow: var(--elevation-2); 
+            z-index: 1000; 
+            border-radius: 28px 28px 0 0; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            border-top: 1px solid var(--md-outline-variant); 
+        }
+        .output-text { 
+            color: var(--md-text-main); 
+            font-size: 14px; 
+            font-weight: 500; 
+            max-height: 90px; 
+            overflow-y: auto; 
+            margin-bottom: 12px; 
+            white-space: pre-wrap; 
+            line-height: 1.5; 
+            background: var(--md-surface-low); 
+            padding: 12px 16px; 
+            border-radius: var(--radius-card); 
+            border: 1px solid var(--md-outline-variant);
+        }
+        .btn-copy-master { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--md-primary); 
+            color: #ffffff; 
+            border: none; 
+            border-radius: var(--radius-pill); 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            min-height: 52px;
+            box-shadow: var(--elevation-1);
+        }
 
-        .toast-container { position: fixed; bottom: 180px; left: 50%; transform: translateX(-50%); z-index: 9999; pointer-events: none; }
-        .toast-box { background: #1e293b; color: #ffffff; padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 700; opacity: 0; transform: translateY(10px); transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15); }
-        .toast-box.show { opacity: 1; transform: translateY(0); }
+        .toast-box { 
+            position: fixed; 
+            bottom: 200px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #2f3033; 
+            color: #f1f0f4; 
+            padding: 10px 22px; 
+            border-radius: var(--radius-pill); 
+            font-size: 14px; 
+            font-weight: 600; 
+            opacity: 0; 
+            transition: opacity 0.2s, transform 0.2s; 
+            pointer-events: none; 
+            z-index: 9999; 
+            box-shadow: var(--elevation-2);
+        }
+        .toast-box.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
     </style>
 </head>
 <body>
 
-<div class="toast-container" id="toast-wrapper"></div>
+<div class="toast-box" id="toast-wrapper"></div>
 
-<div class="tabs">
-    <div class="tab active" onclick="switchTab(0)">極速配搭工作站</div>
-    <div class="tab" onclick="switchTab(1)">後台數據配置</div>
+<div class="app-header">
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(0)">提示詞生成</div>
+        <div class="tab" onclick="switchTab(1)">數據配置</div>
+    </div>
 </div>
 
 <div class="container">
     <div id="section-gen" class="section active">
-        
-        <!-- 頂部核心控制台 -->
-        <div class="control-card">
-            <div class="selector-group">
-                <label>範本架構</label>
-                <select id="sel-template" onchange="updateResult()"></select>
-            </div>
-            <div class="selector-group">
-                <label>產出數量</label>
-                <div class="quantity-control">
-                    <button class="btn-qty" onclick="changeQty(-1)">▼</button>
-                    <input type="text" id="inp-count" value="10" readonly>
-                    <button class="btn-qty" onclick="changeQty(1)">▲</button>
-                </div>
-            </div>
-            <!-- 超簡化：一鍵完全盲盒搭配 -->
-            <button class="btn-shuffle-master" onclick="triggerComboShuffle()">🎲 一鍵盲盒全隨機搭配</button>
-        </div>
-
+        <!-- 1. 衣服款式 -->
         <div class="step-header">
-            <span class="step-label">附加特徵</span>
-            <button class="btn-text-link" style="color:#ef4444;" onclick="clearAllSelections()">重置選擇</button>
+            <span class="step-label">
+                <span class="material-symbols-outlined">checkroom</span> 衣服款式
+            </span>
         </div>
-        <div class="badge-grid" id="features-badges-area"></div>
-        
-        <div class="step-header"><span class="step-label">衣服款式</span></div>
         <div class="slider-container" id="dress-slider-container"></div>
 
-        <div class="step-header"><span class="step-label">鞋子配搭</span></div>
-        <div class="badge-grid" id="shoes-badges-area"></div>
+        <!-- 2. 附加特徵 -->
+        <div class="step-header">
+            <span class="step-label">
+                <span class="material-symbols-outlined">auto_awesome</span> 附加特徵
+            </span>
+            <button class="btn-reset" onclick="clearFeatures()">重置</button>
+        </div>
+        <div class="badge-grid" id="features-badges-area"></div>
 
-        <!-- 環境場景面板 -->
-        <div class="step-header"><span class="step-label">環境場景</span></div>
-        <div class="badge-grid" id="scene-badges-area"></div>
+        <!-- 3. 動作姿態 -->
+        <div class="step-header">
+            <span class="step-label">
+                <span class="material-symbols-outlined">accessibility_new</span> 動作姿態
+            </span>
+        </div>
+        <div class="badge-grid" id="action-badges-area"></div>
         
-        <!-- 精簡優化：隨機動作抽取機（內嵌分段控制鈕） -->
-        <div class="machine-card" id="pose-machine-card">
-            <!-- 分段按鈕代替下拉框 -->
-            <div class="segmented-control" id="action-mode-segments">
-                <div class="segment-btn active" data-mode="scene" onclick="switchActionMode('scene')">場景連動</div>
-                <div class="segment-btn" data-mode="general" onclick="switchActionMode('general')">通用純欲</div>
-                <div class="segment-btn" data-mode="double" onclick="switchActionMode('double')">雙人互動</div>
-            </div>
-
-            <!-- 通用動作分類小標籤（僅在通用模式顯示） -->
-            <div class="badge-grid" id="general-badges-area" style="display:none; margin-bottom:10px;"></div>
-
-            <div id="current-action-display" class="machine-text">正在就緒...</div>
-            
-            <div class="machine-controls">
-                <button class="btn-filled btn-spin" onclick="rollAction(true)">🔄 換一組 Pose</button>
-                <button class="btn-lock" id="btn-lock-pose" onclick="togglePoseLock()">🔓 鎖定</button>
-                <select id="sel-roll-count" onchange="rollAction(true)" style="width: 85px; height: 42px;">
-                    <option value="1">1 條</option>
-                    <option value="2">2 條</option>
-                    <option value="3" selected>3 條</option>
-                </select>
-            </div>
+        <!-- 4. 環境場景 -->
+        <div class="step-header">
+            <span class="step-label">
+                <span class="material-symbols-outlined">beach_access</span> 環境場景
+            </span>
+        </div>
+        <div class="select-wrapper">
+            <select class="md-select" id="scene-select" onchange="onSceneChange(this.value)"></select>
+            <span class="material-symbols-outlined select-arrow">expand_more</span>
         </div>
         
-        <div class="step-header"><span class="step-label">鏡頭視角</span></div>
+        <!-- 5. 鏡頭視角 -->
+        <div class="step-header">
+            <span class="step-label">
+                <span class="material-symbols-outlined">photo_camera</span> 鏡頭視角
+            </span>
+        </div>
         <div class="badge-grid" id="dist-badges-area"></div>
     </div>
 
     <div id="section-cfg" class="section">
-        <div id="accordion-container" style="margin-top: 10px;"></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
-            <button class="btn-secondary" onclick="exportConfig()">匯出 Json</button>
-            <button class="btn-secondary" onclick="importConfig()">導入 Json</button>
+        <div id="accordion-container"></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+            <button class="btn-m3" onclick="exportConfig()">匯出 JSON</button>
+            <button class="btn-m3" onclick="importConfig()">導入 JSON</button>
         </div>
-        <button class="btn-secondary btn-danger" onclick="resetConfig()">恢復系統預設值</button>
+        <button class="btn-m3 btn-danger" onclick="resetConfig()">恢復系統預設</button>
         <input type="file" id="fileInput" style="display:none" onchange="handleFile(this)">
     </div>
 </div>
 
-<!-- 固定底欄 -->
 <div class="footer-preview">
     <div class="output-text" id="final-output"></div>
-    <button class="btn-copy-master" onclick="copyPrompt()">一鍵複製提示詞</button>
+    <button class="btn-copy-master" onclick="copyPrompt()">複製提示詞</button>
 </div>
 
 <script>
-    let selectedExtraFeatures = [], selectedSceneName = '', selectedGeneralCat = '', selectedShoeName = '', selectedDressLine = '', selectedDistLine = '';
-    let currentRandomAction = '', currentActionMode = 'scene', isPoseLocked = false;
+    let selectedExtraFeatures = [], selectedSceneName = '', selectedDressLine = '', selectedDistLine = '', selectedActionObj = null;
+
+    // 質感 Material Design SVG 卡片 (當無輸入網址時的優雅預設)
+    const FALLBACK_SVG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23d3e3fd"/><stop offset="100%" stop-color="%23a8c7fa"/></linearGradient></defs><rect width="300" height="400" fill="url(%23g)"/><path d="M150 130 C135 110, 165 110, 150 130 L115 170 L135 290 L165 290 L185 170 Z" fill="%230b57d0" opacity="0.35"/><circle cx="150" cy="110" r="12" fill="%230b57d0" opacity="0.35"/></svg>';
 
     const items = [
-        { id: 'templates', label: '豆包黃金範本庫（★ 命名）', default: `★ 高效分段核心流\n上傳的照片人物為原型，幫我生成{數量}張照片。\n人物特徵：{特徵}\n衣服：{衣服}{鞋子}\n動作：{動作}\n角度：{鏡頭}\n場景：{場景}\n品質：超寫實 8K，細節拉滿，比例 9:16\n\n★ 豆包精簡英語流\n(Realistic photography), 9:16 ratio, 8k resolution.\n[Subject]: {特徵}, wearing {衣服}, {鞋子}.\n[Action & Scene]: {動作} at {場景}.\n[Camera]: {鏡頭}, cinematic lighting.` },
-        { id: 'baseFeatures', label: '1. 人物基礎核心特徵', default: '小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部' },
-        { id: 'dress', label: '2. 衣服款式 (圖片網址 | 描述)', default: `https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300 | 黑白侍女風短裙穿搭，帶女僕頭飾、領結與蕾絲圍裙元素\nhttps://images.unsplash.com/photo-1612336307429-8a898d10e223?w=300 | 淺藍白侍女風穿搭，帶女僕貓耳頭飾、白色蕾絲雪紡\nhttps://images.unsplash.com/photo-1539008885759-436d81b1337c?w=300 | 白色低領短袖，黑色窄裙，深色尼 nylon 連褲襪，領口綁藍白絲巾\nhttps://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300 | 無袖高領白色針織上衣、灰色緊身短裙、深色尼 nylon 連褲襪` },
-        { id: 'shoes', label: '3. 鞋子款式', default: '光腳無鞋子\n黑色高跟鞋\n黑色高跟涼鞋\n白襪' },
-        { id: 'dist', label: '4. 鏡頭角度與距離', default: '中景\n近景\n俯視近景\n俯視全身超廣角' },
-        { id: 'scene', label: '5. 場景專屬動作池 (# 分組)', default: `# 白色房間\n坐在地上，拉開衣領，頭微微垂下，眼睛向上望鏡頭\n靠在窗簾旁，單手拉起裙擺，若有所思地望向窗外\n# 辦公室\n獨自坐在辦公桌前，單手托腮神情自信地直視鏡頭\n手捧咖啡杯，斜靠在茶水間吧台展現優雅姿態` },
-        { id: 'generalPool', label: '6. 通用純欲動作池 (# 分組)', default: `# 韓系純欲\n韓系純欲風雜誌姿態，雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾\n# 慵懶微醺\n半靠在沙發扶手上，一隻手漫不經心輕拉衣領，雙腿微側交疊\n# 絲襪制服\n輕撫黑絲邊緣，修長雙腿微微交疊，展現極致誘惑的制服感` },
-        { id: 'twoperson', label: '7. 雙人互動動作池', default: '一女完全跨坐在另一人的雙腿上，雙手交叉環繞\n兩人呈仰躺姿態。另一人從後方用單臂橫截下圍' },
-        { id: 'features', label: '8. 附加特徵池', default: '法式瀏海\n腮紅\n銀色耳環\n細框無鏡片眼鏡' },
-        { id: 'count', label: '9. 生成數量預設', default: '10\n1\n4\n9' }
+        { id: 'template', label: '1. 生成範本結構', default: `★ 高效分段核心流\n上傳的照片人物為原型。\n人物特徵：{特徵}\n衣服：{衣服}\n動作：{動作}\n角度：{鏡頭}\n場景：{場景}\n品質：超寫實 8K，細節拉滿，比例 9:16` },
+        { id: 'baseFeatures', label: '2. 人物基礎特徵', default: '小頭、皮膚白皙、極致垂墜的上圍、豐滿曲線、修長腿部' },
+        { id: 'dress', label: '3. 衣服款式 (格式：圖片網址|名稱 或 直接輸入名稱)', default: `https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=80|侍女裙\nhttps://images.unsplash.com/photo-1612336307429-8a898d10e223?w=400&q=80|淺藍雪紡裙\nhttps://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&q=80|白T搭窄裙\nhttps://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80|高領針織衫\nhttps://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&q=80|碎花連身裙\nhttps://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&q=80|西裝套裝` },
+        { id: 'action', label: '4. 通用動作池 (名稱 # 詳細描寫)', default: `韓系純欲 # 雙膝微曲並攏跪坐在柔和的地毯上，身體微微前傾\n慵懶微醺 # 半靠在沙發扶手上，一隻手漫不經心輕拉衣領\n絲襪性感 # 輕撫黑絲邊緣，修長雙腿微微交疊\n溫柔側躺 # 側躺在淺色沙發上，頭微微垂下，眼睛向上望鏡頭\n自信托腮 # 獨自坐在桌前，單手托腮神情自信直視鏡頭` },
+        { id: 'scene', label: '5. 環境場景', default: '白色房間\n辦公室\n海灘沙灘\n奢華酒店' },
+        { id: 'dist', label: '6. 鏡頭視角', default: '中景\n近景\n俯視近景\n俯視全身' },
+        { id: 'features', label: '7. 附加特徵', default: '法式瀏海\n腮紅\n銀色耳環\n細框眼鏡' }
     ];
 
     function toast(msg) {
-        const wrapper = document.getElementById('toast-wrapper');
-        const box = document.createElement('div');
-        box.className = 'toast-box';
-        box.innerText = msg;
-        wrapper.appendChild(box);
-        setTimeout(() => box.classList.add('show'), 30);
-        setTimeout(() => { box.classList.remove('show'); setTimeout(() => box.remove(), 250); }, 2000);
+        const box = document.getElementById('toast-wrapper');
+        box.innerText = msg; box.classList.add('show');
+        setTimeout(() => box.classList.remove('show'), 1600);
     }
 
     function init() {
@@ -228,7 +424,7 @@
             const wrap = document.createElement('div');
             wrap.className = 'accordion-item';
             wrap.innerHTML = `
-                <div class="accordion-header" onclick="toggleAccordion(this)">${item.label.split('（')[0].split('(')[0]}</div>
+                <div class="accordion-header" onclick="toggleAccordion(this)">${item.label}</div>
                 <div class="accordion-content"><textarea id="cfg-${item.id}"></textarea></div>
             `;
             accordionContainer.appendChild(wrap);
@@ -236,13 +432,10 @@
             textarea.value = localStorage.getItem(`cfg-${item.id}`) || item.default;
             textarea.addEventListener('input', () => {
                 localStorage.setItem(`cfg-${item.id}`, textarea.value);
-                if (item.id === 'templates') renderTemplateSelector();
                 syncDataFromConfig();
             });
         });
-        renderTemplateSelector();
         syncDataFromConfig();
-        rollAction(false);
     }
 
     function toggleAccordion(header) {
@@ -252,107 +445,18 @@
         if (!isOpen) item.classList.add('open');
     }
 
-    function renderTemplateSelector() {
-        const sel = document.getElementById('sel-template');
-        const curr = sel.value;
-        const templates = parseTemplates();
-        sel.innerHTML = templates.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-        if (templates.some(t => t.name === curr)) sel.value = curr;
-    }
-
-    function parseTemplates() {
-        return document.getElementById('cfg-templates').value.split(/\n(?=★)/).map(b => {
-            const lines = b.trim().split('\n');
-            return { name: lines[0].replace('★', '').trim(), content: lines.slice(1).join('\n') };
-        }).filter(t => t.name);
-    }
-
-    function parseGroupedLines(rawText, defaultName) {
-        const list = []; let cur = null;
-        rawText.split('\n').forEach(l => {
-            const t = l.trim(); if(!t) return;
-            if(t.startsWith('#')) { cur = { name: t.substring(1).trim(), actions: [] }; list.push(cur); }
-            else { if(cur) cur.actions.push(t); else { cur = { name: defaultName, actions: [t] }; list.push(cur); } }
-        });
-        return list;
-    }
-
     function syncDataFromConfig() {
         renderClothesSlider();
-        renderDistBadges(); 
-        const countInput = document.getElementById('inp-count');
-        const countLines = document.getElementById('cfg-count').value.split('\n').filter(l=>l.trim());
-        if (countLines.length > 0 && countInput.value === '10' && countInput.dataset.modified !== 'true') {
-            countInput.value = countLines[0];
-        }
         renderFeaturesBadges();
-        renderShoesBadges();
-        renderSceneBadges();
-        renderGeneralBadges();
-        updateActionModeUI();
-    }
-
-    function changeQty(amt) {
-        const input = document.getElementById('inp-count');
-        let v = (parseInt(input.value) || 1) + amt;
-        input.value = Math.max(1, Math.min(100, v));
-        input.dataset.modified = 'true';
+        renderActionBadges();
+        renderSceneDropdown();
+        renderDistBadges();
         updateResult();
     }
 
-    function switchActionMode(mode) {
-        currentActionMode = mode;
-        document.querySelectorAll('#action-mode-segments .segment-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.mode === mode);
-        });
-        updateActionModeUI();
-        if (!isPoseLocked) rollAction(false); else updateResult();
-    }
-
-    function updateActionModeUI() {
-        const genArea = document.getElementById('general-badges-area');
-        genArea.style.display = (currentActionMode === 'general') ? 'flex' : 'none';
-        updateResult();
-    }
-
-    function togglePoseLock() {
-        isPoseLocked = !isPoseLocked;
-        const btn = document.getElementById('btn-lock-pose');
-        const card = document.getElementById('pose-machine-card');
-        btn.className = isPoseLocked ? 'btn-lock active' : 'btn-lock';
-        btn.innerText = isPoseLocked ? '🔒 已鎖定' : '🔓 鎖定';
-        card.classList.toggle('locked', isPoseLocked);
-        toast(isPoseLocked ? 'Pose 已鎖定' : 'Pose 已解鎖');
-    }
-
-    // ⚡ 超級簡化流：一鍵完全盲盒隨機搭配
-    function triggerComboShuffle() {
-        // 1. 隨機衣服
-        const dresses = document.querySelectorAll('#dress-slider-container .slider-card');
-        if(dresses.length) dresses[Math.floor(Math.random() * dresses.length)].click();
-
-        // 2. 隨機鞋子
-        const shoes = document.querySelectorAll('#shoes-badges-area .custom-badge');
-        if(shoes.length) shoes[Math.floor(Math.random() * shoes.length)].click();
-
-        // 3. 隨機場景
-        const scenes = document.querySelectorAll('#scene-badges-area .custom-badge');
-        if(scenes.length) scenes[Math.floor(Math.random() * scenes.length)].click();
-
-        // 4. 隨機鏡頭
-        const dists = document.querySelectorAll('#dist-badges-area .custom-badge');
-        if(dists.length) dists[Math.floor(Math.random() * dists.length)].click();
-
-        // 5. 強制刷新 Pose (無視鎖定狀態)
-        rollAction(true);
-
-        toast('🎲 盲盒全隨機搭配成功！');
-    }
-
-    function clearAllSelections() {
-        selectedExtraFeatures = []; selectedShoeName = '';
-        document.querySelectorAll('#features-badges-area .custom-badge, #shoes-badges-area .custom-badge').forEach(el => el.classList.remove('active'));
-        toast('🧹 已重置衣服配搭與特徵');
+    function clearFeatures() {
+        selectedExtraFeatures = [];
+        document.querySelectorAll('#features-badges-area .custom-badge').forEach(el => el.classList.remove('active'));
         updateResult();
     }
 
@@ -360,15 +464,26 @@
         const container = document.getElementById('dress-slider-container'); container.innerHTML = '';
         const lines = document.getElementById('cfg-dress').value.split('\n').filter(l=>l.trim());
         if(!selectedDressLine || !lines.includes(selectedDressLine)) selectedDressLine = lines[0] || '';
-        lines.forEach(line => {
+        
+        lines.forEach((line) => {
             const data = parseLineData(line);
             const card = document.createElement('div');
             card.className = 'slider-card' + (line === selectedDressLine ? ' active' : '');
-            card.innerHTML = `<img src="${data.img || 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300'}"><div class="card-mask"><span class="card-text">${data.text}</span></div>`;
+            
+            const imgSrc = data.img ? data.img : FALLBACK_SVG;
+
+            card.innerHTML = `
+                <img src="${imgSrc}" alt="${data.text}" onerror="this.onerror=null; this.src='${FALLBACK_SVG}';" loading="lazy">
+                <div class="card-mask">
+                    <span class="card-text">${data.text}</span>
+                </div>
+            `;
+            
             card.onclick = () => {
                 selectedDressLine = line;
                 document.querySelectorAll('#dress-slider-container .slider-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active'); updateResult();
+                card.classList.add('active'); 
+                updateResult();
             };
             container.appendChild(card);
         });
@@ -391,146 +506,124 @@
         });
     }
 
-    function renderShoesBadges() {
-        const pool = document.getElementById('cfg-shoes').value.split('\n').filter(l=>l.trim());
-        const area = document.getElementById('shoes-badges-area'); area.innerHTML = '';
-        if(selectedShoeName && !pool.includes(selectedShoeName)) selectedShoeName = '';
-        pool.forEach(shoe => {
-            const b = document.createElement('div');
-            b.className = 'custom-badge' + (shoe === selectedShoeName ? ' active' : '');
-            b.innerText = shoe;
-            b.onclick = () => {
-                document.querySelectorAll('#shoes-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
-                if(selectedShoeName === shoe) { selectedShoeName = ''; } else { b.classList.add('active'); selectedShoeName = shoe; }
-                updateResult();
-            };
-            area.appendChild(b);
+    function renderActionBadges() {
+        const pool = document.getElementById('cfg-action').value.split('\n').filter(l=>l.trim());
+        const area = document.getElementById('action-badges-area'); area.innerHTML = '';
+        const actionsParsed = pool.map(line => {
+            const parts = line.split('#');
+            return { name: parts[0].trim(), detail: parts[1] ? parts[1].trim() : parts[0].trim() };
         });
-    }
-
-    function renderDistBadges() {
-        const distLines = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
-        const area = document.getElementById('dist-badges-area'); area.innerHTML = '';
-        if(!selectedDistLine || !distLines.includes(selectedDistLine)) selectedDistLine = distLines[0] || '';
-        distLines.forEach(line => {
-            const b = document.createElement('div');
-            b.className = 'custom-badge' + (line === selectedDistLine ? ' active' : '');
-            b.innerText = parseLineData(line).text;
-            b.onclick = () => {
-                document.querySelectorAll('#dist-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
-                b.classList.add('active'); selectedDistLine = line; updateResult();
-            };
-            area.appendChild(b);
-        });
-    }
-
-    function renderSceneBadges() {
-        const parsed = parseGroupedLines(document.getElementById('cfg-scene').value, '預設場景');
-        const area = document.getElementById('scene-badges-area'); area.innerHTML = ''; if(!parsed.length) return;
-        if(!selectedSceneName || !parsed.some(p=>p.name === selectedSceneName)) selectedSceneName = parsed[0].name;
-        parsed.forEach(sc => {
-            const b = document.createElement('div');
-            b.className = 'custom-badge' + (sc.name === selectedSceneName ? ' active' : '');
-            b.innerText = sc.name;
-            b.onclick = () => {
-                document.querySelectorAll('#scene-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
-                b.classList.add('active'); selectedSceneName = sc.name;
-                if (currentActionMode === 'scene' && !isPoseLocked) rollAction(false); else updateResult();
-            };
-            area.appendChild(b);
-        });
-    }
-
-    function renderGeneralBadges() {
-        const parsed = parseGroupedLines(document.getElementById('cfg-generalPool').value, '通用預設');
-        const area = document.getElementById('general-badges-area'); area.innerHTML = ''; if(!parsed.length) return;
-        if(!selectedGeneralCat || !parsed.some(p=>p.name === selectedGeneralCat)) selectedGeneralCat = parsed[0].name;
-        parsed.forEach(cat => {
-            const b = document.createElement('div');
-            b.className = 'custom-badge' + (cat.name === selectedGeneralCat ? ' active' : '');
-            b.innerText = cat.name;
-            b.onclick = () => {
-                document.querySelectorAll('#general-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
-                b.classList.add('active'); selectedGeneralCat = cat.name;
-                if(!isPoseLocked) rollAction(false); else updateResult();
-            };
-            area.appendChild(b);
-        });
-    }
-
-    function rollAction(isUserTriggered) {
-        if (isPoseLocked && !isUserTriggered) return; 
-        const maxRoll = parseInt(document.getElementById('sel-roll-count').value) || 3;
-        let pool = [];
-
-        if (currentActionMode === 'general') {
-            const match = parseGroupedLines(document.getElementById('cfg-generalPool').value, '通用預設').find(p=>p.name === selectedGeneralCat);
-            if(match) pool = [...match.actions];
-        } else if (currentActionMode === 'double') {
-            pool = document.getElementById('cfg-twoperson').value.split('\n').filter(l=>l.trim());
-        } else {
-            const match = parseGroupedLines(document.getElementById('cfg-scene').value, '預設場景').find(p=>p.name === selectedSceneName);
-            if(match) pool = [...match.actions];
+        if(!selectedActionObj || !actionsParsed.some(a => a.name === selectedActionObj.name)) {
+            selectedActionObj = actionsParsed[0] || { name: '', detail: '' };
         }
+        actionsParsed.forEach(act => {
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (act.name === selectedActionObj.name ? ' active' : '');
+            b.innerText = act.name;
+            b.onclick = () => {
+                document.querySelectorAll('#action-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
+                b.classList.add('active'); selectedActionObj = act; updateResult();
+            };
+            area.appendChild(b);
+        });
+    }
 
-        if(pool.length > 0) {
-            let res = [], poolCopy = [...pool], finalMax = Math.min(maxRoll, pool.length);
-            for(let i=0; i<finalMax; i++) res.push(poolCopy.splice(Math.floor(Math.random()*poolCopy.length), 1)[0]);
-            currentRandomAction = res.join('，');
-        } else {
-            currentRandomAction = '自然放鬆的姿態';
-        }
-        document.getElementById('current-action-display').innerText = currentRandomAction;
+    function renderSceneDropdown() {
+        const pool = document.getElementById('cfg-scene').value.split('\n').filter(l=>l.trim());
+        const select = document.getElementById('scene-select');
+        select.innerHTML = '';
+        if(!selectedSceneName || !pool.includes(selectedSceneName)) selectedSceneName = pool[0] || '';
+        
+        pool.forEach(sc => {
+            const opt = document.createElement('option');
+            opt.value = sc;
+            opt.textContent = sc;
+            if(sc === selectedSceneName) opt.selected = true;
+            select.appendChild(opt);
+        });
+    }
+
+    function onSceneChange(val) {
+        selectedSceneName = val;
         updateResult();
     }
 
+    function renderDistBadges() {
+        const pool = document.getElementById('cfg-dist').value.split('\n').filter(l=>l.trim());
+        const area = document.getElementById('dist-badges-area'); area.innerHTML = '';
+        if(!selectedDistLine || !pool.includes(selectedDistLine)) selectedDistLine = pool[0] || '';
+        pool.forEach(dist => {
+            const b = document.createElement('div');
+            b.className = 'custom-badge' + (dist === selectedDistLine ? ' active' : '');
+            b.innerText = dist;
+            b.onclick = () => {
+                document.querySelectorAll('#dist-badges-area .custom-badge').forEach(el=>el.classList.remove('active'));
+                b.classList.add('active'); selectedDistLine = dist; updateResult();
+            };
+            area.appendChild(b);
+        });
+    }
+
     function updateResult() {
-        const countVal = document.getElementById('inp-count').value || '10';
         const baseFeat = document.getElementById('cfg-baseFeatures').value.trim();
         const fullFeatures = baseFeat + (selectedExtraFeatures.length > 0 ? "、" + selectedExtraFeatures.join('、') : "");
-        const shoePrompt = selectedShoeName ? `，踏著${selectedShoeName}` : "";
-        const templateName = document.getElementById('sel-template').value;
-        const targetTemplate = parseTemplates().find(t => t.name === templateName);
+        const templateStr = document.getElementById('cfg-template').value;
+        const actionText = selectedActionObj ? selectedActionObj.detail : '';
 
-        if (targetTemplate) {
-            document.getElementById('final-output').innerText = targetTemplate.content
-                .replace(/{數量}/g, countVal).replace(/{特徵}/g, fullFeatures)
-                .replace(/{衣服}/g, parseLineData(selectedDressLine).text).replace(/{鞋子}/g, shoePrompt)
-                .replace(/{動作}/g, currentRandomAction).replace(/{鏡頭}/g, parseLineData(selectedDistLine).text)
-                .replace(/{場景}/g, selectedSceneName);
-        }
+        const output = templateStr
+            .replace(/{特徵}/g, fullFeatures)
+            .replace(/{衣服}/g, parseLineData(selectedDressLine).text)
+            .replace(/{動作}/g, actionText)
+            .replace(/{鏡頭}/g, parseLineData(selectedDistLine).text)
+            .replace(/{場景}/g, selectedSceneName);
+
+        document.getElementById('final-output').innerText = output;
     }
 
     function parseLineData(line) {
         if (!line) return { img: '', text: '' };
-        if (line.includes('|')) { const parts = line.split('|'); return { img: parts[0].trim(), text: parts[1].trim() }; }
-        return { img: '', text: line.trim() };
+        const cleanLine = line.trim();
+        if (cleanLine.includes('|')) { 
+            const parts = cleanLine.split('|'); 
+            return { img: parts[0].trim(), text: parts[1].trim() }; 
+        }
+        return { img: '', text: cleanLine };
     }
-    function resetConfig() { if(confirm('確定要清除自訂內容還原？')) { items.forEach(item => localStorage.removeItem(`cfg-${item.id}`)); document.getElementById('inp-count').dataset.modified = 'false'; isPoseLocked = false; init(); toast('已還原系統預設'); } }
+
+    function resetConfig() { 
+        if(confirm('確定要還原系統預設？')) { 
+            items.forEach(item => localStorage.removeItem(`cfg-${item.id}`)); 
+            init(); toast('已還原預設'); 
+        } 
+    }
+
     function exportConfig() {
         const data = {}; items.forEach(item => data[item.id] = document.getElementById(`cfg-${item.id}`).value);
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
-        a.download = `prompt_v9.5_master.json`; a.click(); toast('Json 備份已匯出');
+        a.download = `prompt_m3_fashion_manual.json`; a.click(); toast('JSON 已匯出');
     }
+
     function importConfig() { document.getElementById('fileInput').click(); }
+    
     function handleFile(input) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            const data = JSON.parse(e.target.result);
+            const data = JSON.parse(e.result);
             items.forEach(item => { if(data[item.id]) { document.getElementById(`cfg-${item.id}`).value = data[item.id]; localStorage.setItem(`cfg-${item.id}`, data[item.id]); } });
-            document.getElementById('inp-count').dataset.modified = 'false';
-            renderTemplateSelector(); syncDataFromConfig(); rollAction(false); toast('配置已導入');
+            syncDataFromConfig(); toast('配置已導入');
         };
         reader.readAsText(input.files[0]);
     }
+
     function switchTab(idx) {
         document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
         document.getElementById('section-gen').classList.toggle('active', idx === 0);
         document.getElementById('section-cfg').classList.toggle('active', idx === 1);
         if(idx === 0) syncDataFromConfig();
     }
+
     function copyPrompt() {
-        navigator.clipboard.writeText(document.getElementById('final-output').innerText).then(() => toast('提示詞已複製！'));
+        navigator.clipboard.writeText(document.getElementById('final-output').innerText).then(() => toast('已複製提示詞！'));
     }
 
     init();
